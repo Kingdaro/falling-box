@@ -44,8 +44,7 @@ export class Player {
   }
 
   draw() {
-    renderer.clearRect(0, 0, canvas.width, canvas.height)
     renderer.fillStyle = 'white'
-    renderer.fillRect(this.x, this.y, 50, 50)
+    renderer.fillRect(this.x, this.y, this.width, this.height)
   }
 }
