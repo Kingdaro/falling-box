@@ -10,16 +10,17 @@ function update(dt: number) {
   player.update(dt)
 }
 
-function draw() {
-  player.draw()
-}
-
 function keydown(event: KeyboardEvent) {
   player.keydown(event)
 }
 
 function keyup(event: KeyboardEvent) {
   player.keyup(event)
+}
+
+function draw() {
+  renderer.clearRect(0, 0, canvas.width, canvas.height)
+  player.draw()
 }
 
 export async function run() {
@@ -29,6 +30,7 @@ export async function run() {
   canvas.onkeydown = keydown
   canvas.onkeyup = keyup
   canvas.tabIndex = 0
+  document.body.innerHTML = ''
   document.body.appendChild(canvas)
   canvas.focus()
 
