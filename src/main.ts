@@ -1,1 +1,3 @@
-document.body.innerHTML = 'Hello, world!'
+import { run } from './game'
+
+run()
