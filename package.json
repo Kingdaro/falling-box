@@ -1,7 +1,7 @@
 {
-  "name": "my-awesome-minimal-typescript-project",
+  "name": "falling-box",
   "version": "0.1.0",
-  "description": "it does a thing, probably",
+  "description": "a game with falling boxes",
   "author": "just nobody",
   "license": "MIT",
   "scripts": {
