@@ -1,56 +1,25 @@
 import { animationFrame } from './util'
+import { Player } from './player'
 
-const canvas = document.createElement('canvas')
-const renderer = canvas.getContext('2d') as CanvasRenderingContext2D
+export const canvas = document.createElement('canvas')
+export const renderer = canvas.getContext('2d') as CanvasRenderingContext2D
 
-const player = {
-  x: 100,
-  y: 100,
-  width: 50,
-  height: 50,
-  xvel: 0,
-  yvel: 0,
-  movingLeft: false,
-  movingRight: false,
-  speed: 500,
-}
+const player = new Player()
 
 function update(dt: number) {
-  if (player.movingLeft) player.x -= player.speed * dt
-  if (player.movingRight) player.x += player.speed * dt
-
-  player.yvel += dt * 2500
-  player.y += player.yvel * dt
-
-  if (player.y + player.height >= canvas.height) {
-    player.y = canvas.height - player.height
-  }
+  player.update(dt)
 }
 
 function draw() {
-  renderer.clearRect(0, 0, canvas.width, canvas.height)
-  renderer.fillStyle = 'white'
-  renderer.fillRect(player.x, player.y, 50, 50)
+  player.draw()
 }
 
 function keydown(event: KeyboardEvent) {
-  if (event.key === 'ArrowUp') {
-    player.yvel = -800
-  }
-
-  if (event.key === 'ArrowLeft') {
-    player.movingLeft = true
-    player.movingRight = false
-  }
-  if (event.key === 'ArrowRight') {
-    player.movingRight = true
-    player.movingLeft = false
-  }
+  player.keydown(event)
 }
 
 function keyup(event: KeyboardEvent) {
-  if (event.key === 'ArrowLeft') player.movingLeft = false
-  if (event.key === 'ArrowRight') player.movingRight = false
+  player.keyup(event)
 }
 
 export async function run() {
