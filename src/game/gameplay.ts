@@ -5,9 +5,12 @@ import { FallingBlock } from './falling-block'
 import { GameObject } from './game-object'
 import { lerpClamped, randomRange } from '../util/math'
 
-const worldScale = 70
 const cameraStiffness = 10
 const cameraVerticalOffset = 150
+const fallingBlockSpawnHeight = -800
+const playerSpawnHeight = -300
+const worldFalloutDepth = 1000
+const worldScale = 70
 
 export class GameplayState extends GameState {
   player = new Player()
@@ -45,14 +48,14 @@ export class GameplayState extends GameState {
 
   spawnFallingBlock() {
     const x = randomRange(0, 19) * worldScale
-    const block = new FallingBlock(x, -500, worldScale)
+    const block = new FallingBlock(x, fallingBlockSpawnHeight, worldScale)
     this.fallingBlocks.push(block)
     this.worldContainer.addChild(block.sprite)
   }
 
   respawnPlayer() {
     this.player.x = randomRange(0, 19) * worldScale
-    this.player.y = -300
+    this.player.y = playerSpawnHeight
     this.player.xvel = 0
     this.player.yvel = 0
   }
@@ -73,7 +76,7 @@ export class GameplayState extends GameState {
   updatePlayer(dt: number) {
     this.player.update(dt)
 
-    if (this.player.y > 1000) {
+    if (this.player.y > worldFalloutDepth) {
       this.respawnPlayer()
     }
 
