@@ -1,4 +1,5 @@
 import * as pixi from 'pixi.js'
+import { lerpClamped } from '../util/math'
 
 export class Player {
   sprite = new pixi.Graphics()
@@ -14,7 +15,7 @@ export class Player {
   }
 
   update(dt: number) {
-    this.xvel = this.movement * this.speed
+    this.xvel = lerpClamped(this.xvel, this.movement * this.speed, dt * 15)
     this.yvel += 2500 * dt
 
     this.sprite.x += this.xvel * dt
