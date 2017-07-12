@@ -1,5 +1,5 @@
-// import * as pixi from 'pixi.js'
-import { GameState, viewWidth } from './game'
+import * as pixi from 'pixi.js'
+import { GameState, viewWidth, viewHeight } from './game'
 import { Player, PlayerInput } from './player'
 import { FallingBlock } from './falling-block'
 import { GameObject } from './game-object'
@@ -12,8 +12,12 @@ export class GameplayState extends GameState {
   fallingBlocks = [] as FallingBlock[]
   worldBlocks = [] as GameObject[]
 
+  worldContainer = new pixi.Container()
+
   enter() {
-    this.stage.addChild(this.player.sprite)
+    this.stage.addChild(this.worldContainer)
+
+    this.worldContainer.addChild(this.player.sprite)
     this.player.x = 100
     this.player.y = -100
 
@@ -36,19 +40,28 @@ export class GameplayState extends GameState {
     this.addWorldBlock(0, 0, 20, 1)
     this.addWorldBlock(1, 1, 18, 1)
     this.addWorldBlock(2, 2, 16, 1)
-    this.worldBlocks.forEach(b => this.stage.addChild(b.sprite))
+    this.worldBlocks.forEach(b => this.worldContainer.addChild(b.sprite))
   }
 
   spawnFallingBlock() {
     const x = Math.random() * (viewWidth - worldScale)
-    const block = new FallingBlock(x, -100, worldScale)
+    const block = new FallingBlock(x, -500, worldScale)
     this.fallingBlocks.push(block)
-    this.stage.addChild(block.sprite)
+    this.worldContainer.addChild(block.sprite)
   }
 
   update(dt: number) {
+    this.fallingBlocks.forEach(fb => {
+      fb.update(dt)
+      this.worldBlocks.forEach(wb => fb.resolveCollision(wb))
+    })
+
     this.updatePlayer(dt)
-    this.fallingBlocks.forEach(b => b.update(dt))
+
+    this.worldContainer.position.set(
+      -this.player.center.x + viewWidth / 2,
+      -this.player.center.y + viewHeight / 2
+    )
   }
 
   updatePlayer(dt: number) {
