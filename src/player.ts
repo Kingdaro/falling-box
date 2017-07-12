@@ -1,50 +1,46 @@
-import { canvas, renderer } from './game'
+import * as pixi from 'pixi.js'
 
 export class Player {
-  x = 100
-  y = 100
-  width = 50
-  height = 50
+  sprite = new pixi.Graphics()
   xvel = 0
   yvel = 0
-  movingLeft = false
-  movingRight = false
   speed = 500
+  movement = 0
+
+  constructor() {
+    this.sprite.beginFill(0xffffff)
+    this.sprite.drawRect(0, 0, 50, 50)
+    this.sprite.endFill()
+  }
 
   update(dt: number) {
-    if (this.movingLeft) this.x -= this.speed * dt
-    if (this.movingRight) this.x += this.speed * dt
+    this.xvel = this.movement * this.speed
+    this.yvel += 2500 * dt
 
-    this.yvel += dt * 2500
-    this.y += this.yvel * dt
+    this.sprite.x += this.xvel * dt
+    this.sprite.y += this.yvel * dt
 
-    if (this.y + this.height >= canvas.height) {
-      this.y = canvas.height - this.height
+    if (this.sprite.y + this.sprite.height > 720) {
+      this.sprite.y = 720 - this.sprite.height
     }
   }
 
-  keydown(event: KeyboardEvent) {
-    if (event.key === 'ArrowUp') {
-      this.yvel = -800
-    }
+  jump() {
+    this.yvel = -800
+  }
+}
 
-    if (event.key === 'ArrowLeft') {
-      this.movingLeft = true
-      this.movingRight = false
-    }
-    if (event.key === 'ArrowRight') {
-      this.movingRight = true
-      this.movingLeft = false
-    }
+export class PlayerInput {
+  constructor(private player: Player) {}
+
+  keydown(event: KeyboardEvent) {
+    if (event.key === 'ArrowUp') this.player.jump()
+    if (event.key === 'ArrowLeft') this.player.movement = -1
+    if (event.key === 'ArrowRight') this.player.movement = 1
   }
 
   keyup(event: KeyboardEvent) {
-    if (event.key === 'ArrowLeft') this.movingLeft = false
-    if (event.key === 'ArrowRight') this.movingRight = false
-  }
-
-  draw() {
-    renderer.fillStyle = 'white'
-    renderer.fillRect(this.x, this.y, this.width, this.height)
+    if (event.key === 'ArrowLeft' && this.player.movement < 0) this.player.movement = 0
+    if (event.key === 'ArrowRight' && this.player.movement > 0) this.player.movement = 0
   }
 }
