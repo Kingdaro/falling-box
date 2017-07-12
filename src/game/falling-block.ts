@@ -1,17 +1,15 @@
-import * as pixi from 'pixi.js'
+// import * as pixi from 'pixi.js'
+import { createRect } from '../util/pixi'
 
 export const size = 70
 export const gravity = 1200
 
 export class FallingBlock {
-  sprite = new pixi.Graphics()
+  sprite = createRect(size)
   xvel = 0
   yvel = 0
 
   constructor(x: number, y: number) {
-    this.sprite.beginFill(0xffffff)
-    this.sprite.drawRect(0, 0, size, size)
-    this.sprite.endFill()
     this.sprite.position.set(x, y)
   }
 
