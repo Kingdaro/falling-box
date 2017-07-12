@@ -1,8 +1,10 @@
 // import * as pixi from 'pixi.js'
 import { GameState, viewWidth } from './game'
 import { Player, PlayerInput } from './player'
-import { FallingBlock, blockSize } from './falling-block'
+import { FallingBlock } from './falling-block'
 import { GameObject } from './game-object'
+
+const worldScale = 70
 
 export class GameplayState extends GameState {
   player = new Player()
@@ -12,20 +14,34 @@ export class GameplayState extends GameState {
 
   enter() {
     this.stage.addChild(this.player.sprite)
-    this.player.sprite.position.set(100, 100)
+    this.player.x = 100
+    this.player.y = -100
 
     this.createWorld()
     this.spawnFallingBlock()
   }
 
+  addWorldBlock(wx: number, wy: number, wwidth: number, wheight: number) {
+    this.worldBlocks.push(
+      new GameObject(
+        wx * worldScale,
+        wy * worldScale,
+        wwidth * worldScale,
+        wheight * worldScale
+      )
+    )
+  }
+
   createWorld() {
-    this.worldBlocks.push(new GameObject(50, 400, 300, 50))
+    this.addWorldBlock(0, 0, 20, 1)
+    this.addWorldBlock(1, 1, 18, 1)
+    this.addWorldBlock(2, 2, 16, 1)
     this.worldBlocks.forEach(b => this.stage.addChild(b.sprite))
   }
 
   spawnFallingBlock() {
-    const x = Math.random() * (viewWidth - blockSize)
-    const block = new FallingBlock(x, -100)
+    const x = Math.random() * (viewWidth - worldScale)
+    const block = new FallingBlock(x, -100, worldScale)
     this.fallingBlocks.push(block)
     this.stage.addChild(block.sprite)
   }

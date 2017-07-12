@@ -14,7 +14,7 @@ export class Player extends GameObject {
   gravity = gravity
 
   constructor() {
-    super(100, 100, playerSize)
+    super(0, 0, playerSize)
   }
 
   update(dt: number) {
