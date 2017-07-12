@@ -2,9 +2,6 @@
   "defaultSeverity": "warn",
   "extends": [],
   "rules": {
-    "no-unused-variable": [
-      true
-    ],
     "semicolon": [
       true,
       "never"

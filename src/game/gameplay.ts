@@ -1,5 +1,5 @@
-import * as pixi from 'pixi.js'
-import { GameState, InteractionEvent } from './game'
+// import * as pixi from 'pixi.js'
+import { GameState } from './game'
 import { Player, PlayerInput } from './player'
 
 export class GameplayState extends GameState {

@@ -2,7 +2,6 @@ import * as pixi from 'pixi.js'
 import { Game } from './game/game'
 import { GameplayState } from './game/gameplay'
 
-declare const require: Function
 declare const module: any
 
 function run() {
