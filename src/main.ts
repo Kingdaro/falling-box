@@ -3,25 +3,47 @@ import * as pixi from 'pixi.js'
 declare const require: Function
 declare const module: any
 
+type InteractionEvent = pixi.interaction.InteractionEvent
+
 class Game {
-  text = this.app.stage.addChild(new pixi.Text('hi', { fill: 'white' }))
+  private state = new GameState()
 
   constructor(private app: pixi.Application) {
-    this.text.position.set(100, 100)
-    this.text.anchor.set(0.5, 0.5)
+    app.ticker.add(dt => this.state.update(dt / 60))
+
+    const interaction = new pixi.interaction.InteractionManager(app.renderer)
+    interaction.addListener('keydown', (event: InteractionEvent) => this.state.keydown(event))
+    interaction.addListener('keyup', (event: InteractionEvent) => this.state.keyup(event))
+    interaction.addListener('pointerdown', (event: InteractionEvent) => this.state.pointerdown(event))
+    interaction.addListener('pointerup', (event: InteractionEvent) => this.state.pointerup(event))
+    interaction.addListener('pointermove', (event: InteractionEvent) => this.state.pointermove(event))
   }
 
-  update(dt: number) {
-    this.text.rotation += dt * 3
+  setState(state: GameState) {
+    state.game = this
+    this.app.stage.removeChildren()
+    this.state.leave()
+    this.state = state
+    this.state.enter()
   }
+}
+
+class GameState {
+  game: Game
+  enter() {}
+  leave() {}
+  update(dt: number) {}
+  keyup(event: InteractionEvent) {}
+  keydown(event: InteractionEvent) {}
+  pointerdown(event: InteractionEvent) {}
+  pointerup(event: InteractionEvent) {}
+  pointermove(event: InteractionEvent) {}
 }
 
 function run() {
   const app = new pixi.Application(1280, 720)
   const game = new Game(app)
-
-  app.ticker.add(dt => game.update(dt / 60))
-
+  app.start()
   document.body.innerHTML = ''
   document.body.appendChild(app.view)
 }
