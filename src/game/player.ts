@@ -1,6 +1,5 @@
 // import * as pixi from 'pixi.js'
 import { lerpClamped } from '../util/math'
-import { viewHeight } from './game'
 import { GameObject } from './game-object'
 
 const playerSize = 50
@@ -26,10 +25,6 @@ export class Player extends GameObject {
 
     this.applyGravity(dt)
     this.applyVelocity(dt)
-
-    if (this.y + this.height > viewHeight) {
-      this.y = viewHeight - this.height
-    }
   }
 
   jump() {

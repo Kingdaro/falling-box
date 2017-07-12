@@ -19,11 +19,8 @@ export class GameplayState extends GameState {
 
   enter() {
     this.stage.addChild(this.worldContainer)
-
     this.worldContainer.addChild(this.player.sprite)
-    this.player.x = 100
-    this.player.y = -100
-
+    this.respawnPlayer()
     this.createWorld()
     this.spawnFallingBlock()
   }
@@ -53,6 +50,13 @@ export class GameplayState extends GameState {
     this.worldContainer.addChild(block.sprite)
   }
 
+  respawnPlayer() {
+    this.player.x = randomRange(0, 19) * worldScale
+    this.player.y = -300
+    this.player.xvel = 0
+    this.player.yvel = 0
+  }
+
   update(dt: number) {
     this.updateFallingBlocks(dt)
     this.updatePlayer(dt)
@@ -68,6 +72,11 @@ export class GameplayState extends GameState {
 
   updatePlayer(dt: number) {
     this.player.update(dt)
+
+    if (this.player.y > 1000) {
+      this.respawnPlayer()
+    }
+
     this.worldBlocks.forEach(b => this.player.resolveCollision(b))
     this.fallingBlocks.forEach(b => this.player.resolveCollision(b))
   }
