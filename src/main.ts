@@ -10,6 +10,8 @@ function run() {
   game.setState(new GameplayState())
   document.body.innerHTML = ''
   document.body.appendChild(app.view)
+  app.start()
+  app.view.focus()
 }
 
 run()
