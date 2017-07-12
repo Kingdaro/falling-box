@@ -9,8 +9,8 @@ const worldScale = 70
 export class GameplayState extends GameState {
   player = new Player()
   playerInput = new PlayerInput(this.player)
-  fallingBlocks = [] as FallingBlock[]
   worldBlocks = [] as GameObject[]
+  fallingBlocks = [] as FallingBlock[]
 
   worldContainer = new pixi.Container()
 
@@ -51,23 +51,29 @@ export class GameplayState extends GameState {
   }
 
   update(dt: number) {
+    this.updateFallingBlocks(dt)
+    this.updatePlayer(dt)
+    this.updateCamera()
+  }
+
+  updateFallingBlocks(dt: number) {
     this.fallingBlocks.forEach(fb => {
       fb.update(dt)
       this.worldBlocks.forEach(wb => fb.resolveCollision(wb))
     })
-
-    this.updatePlayer(dt)
-
-    this.worldContainer.position.set(
-      -this.player.center.x + viewWidth / 2,
-      -this.player.center.y + viewHeight / 2
-    )
   }
 
   updatePlayer(dt: number) {
     this.player.update(dt)
     this.worldBlocks.forEach(b => this.player.resolveCollision(b))
     this.fallingBlocks.forEach(b => this.player.resolveCollision(b))
+  }
+
+  updateCamera() {
+    this.worldContainer.position.set(
+      -this.player.center.x + viewWidth / 2,
+      -this.player.center.y + viewHeight / 2
+    )
   }
 
   keydown(event: KeyboardEvent) {
