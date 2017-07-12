@@ -1,46 +1,38 @@
-import { animationFrame } from './util'
-import { Player } from './player'
+import * as pixi from 'pixi.js'
 
-export const canvas = document.createElement('canvas')
-export const renderer = canvas.getContext('2d') as CanvasRenderingContext2D
+export type InteractionEvent = pixi.interaction.InteractionEvent
 
-const player = new Player()
+export class Game {
+  private state = new GameState()
 
-function update(dt: number) {
-  player.update(dt)
-}
+  constructor(private app: pixi.Application) {
+    app.ticker.add(dt => this.state.update(dt / 60))
 
-function keydown(event: KeyboardEvent) {
-  player.keydown(event)
-}
-
-function keyup(event: KeyboardEvent) {
-  player.keyup(event)
-}
-
-function draw() {
-  renderer.clearRect(0, 0, canvas.width, canvas.height)
-  player.draw()
-}
-
-export async function run() {
-  canvas.width = 1280
-  canvas.height = 720
-  canvas.style.backgroundColor = 'black'
-  canvas.onkeydown = keydown
-  canvas.onkeyup = keyup
-  canvas.tabIndex = 0
-  document.body.innerHTML = ''
-  document.body.appendChild(canvas)
-  canvas.focus()
-
-  let time = await animationFrame()
-
-  while (true) {
-    const frameTime = await animationFrame()
-    const elapsed = (frameTime - time) / 1000
-    time = frameTime
-    update(elapsed)
-    draw()
+    const interaction = new pixi.interaction.InteractionManager(app.renderer)
+    interaction.addListener('keydown', (event: InteractionEvent) => this.state.keydown(event))
+    interaction.addListener('keyup', (event: InteractionEvent) => this.state.keyup(event))
+    interaction.addListener('pointerdown', (event: InteractionEvent) => this.state.pointerdown(event))
+    interaction.addListener('pointerup', (event: InteractionEvent) => this.state.pointerup(event))
+    interaction.addListener('pointermove', (event: InteractionEvent) => this.state.pointermove(event))
   }
+
+  setState(state: GameState) {
+    state.game = this
+    this.app.stage.removeChildren()
+    this.state.leave()
+    this.state = state
+    this.state.enter()
+  }
+}
+
+export class GameState {
+  game: Game
+  enter() {}
+  leave() {}
+  update(dt: number) {}
+  keyup(event: InteractionEvent) {}
+  keydown(event: InteractionEvent) {}
+  pointerdown(event: InteractionEvent) {}
+  pointerup(event: InteractionEvent) {}
+  pointermove(event: InteractionEvent) {}
 }
