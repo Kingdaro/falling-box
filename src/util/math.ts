@@ -11,3 +11,7 @@ export function clamp(value: number, min: number, max: number) {
 export function lerpClamped(value: number, target: number, delta: number) {
   return lerp(value, target, clamp(delta, 0, 1))
 }
+
+export function randomRange(min: number, max: number) {
+  return Math.random() * (max - min) + min
+}

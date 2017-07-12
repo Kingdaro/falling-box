@@ -3,7 +3,7 @@ import { GameState, viewWidth, viewHeight } from './game'
 import { Player, PlayerInput } from './player'
 import { FallingBlock } from './falling-block'
 import { GameObject } from './game-object'
-import { lerpClamped } from '../util/math'
+import { lerpClamped, randomRange } from '../util/math'
 
 const worldScale = 70
 const cameraStiffness = 10
@@ -47,7 +47,7 @@ export class GameplayState extends GameState {
   }
 
   spawnFallingBlock() {
-    const x = Math.random() * (viewWidth - worldScale)
+    const x = randomRange(0, 19) * worldScale
     const block = new FallingBlock(x, -500, worldScale)
     this.fallingBlocks.push(block)
     this.worldContainer.addChild(block.sprite)
