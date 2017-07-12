@@ -1,6 +1,7 @@
 // import * as pixi from 'pixi.js'
 import { lerpClamped } from '../util/math'
 import { createRect } from '../util/pixi'
+import { viewHeight } from './game'
 
 const size = 50
 const movementSpeed = 500
@@ -21,8 +22,8 @@ export class Player {
     this.sprite.x += this.xvel * dt
     this.sprite.y += this.yvel * dt
 
-    if (this.sprite.y + this.sprite.height > 720) {
-      this.sprite.y = 720 - this.sprite.height
+    if (this.sprite.y + this.sprite.height > viewHeight) {
+      this.sprite.y = viewHeight - this.sprite.height
     }
   }
 
