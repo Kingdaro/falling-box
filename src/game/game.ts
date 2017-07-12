@@ -2,12 +2,16 @@ import * as pixi from 'pixi.js'
 
 export type InteractionEvent = pixi.interaction.InteractionEvent
 
+export const viewWidth = 1280
+export const viewHeight = 720
+
 export class Game {
   private state = new GameState()
 
   constructor(public app: pixi.Application) {
     app.ticker.add(dt => this.state.update(dt / 60))
 
+    app.renderer.resize(viewWidth, viewHeight)
     app.view.tabIndex = 0
     app.view.onkeydown = event => this.state.keydown(event)
     app.view.onkeyup = event => this.state.keyup(event)

@@ -5,10 +5,9 @@ import { GameplayState } from './game/gameplay'
 declare const module: any
 
 function run() {
-  const app = new pixi.Application(1280, 720)
+  const app = new pixi.Application()
   const game = new Game(app)
   game.setState(new GameplayState())
-  app.start()
   document.body.innerHTML = ''
   document.body.appendChild(app.view)
 }
