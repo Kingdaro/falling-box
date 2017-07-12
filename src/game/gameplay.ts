@@ -3,8 +3,11 @@ import { GameState, viewWidth, viewHeight } from './game'
 import { Player, PlayerInput } from './player'
 import { FallingBlock } from './falling-block'
 import { GameObject } from './game-object'
+import { lerpClamped } from '../util/math'
 
 const worldScale = 70
+const cameraStiffness = 10
+const cameraVerticalOffset = 150
 
 export class GameplayState extends GameState {
   player = new Player()
@@ -53,7 +56,7 @@ export class GameplayState extends GameState {
   update(dt: number) {
     this.updateFallingBlocks(dt)
     this.updatePlayer(dt)
-    this.updateCamera()
+    this.updateCamera(dt)
   }
 
   updateFallingBlocks(dt: number) {
@@ -69,10 +72,14 @@ export class GameplayState extends GameState {
     this.fallingBlocks.forEach(b => this.player.resolveCollision(b))
   }
 
-  updateCamera() {
+  updateCamera(dt: number) {
+    const xTarget = -this.player.center.x + viewWidth / 2
+    const yTarget =
+      -this.player.center.y + viewHeight / 2 + cameraVerticalOffset
+
     this.worldContainer.position.set(
-      -this.player.center.x + viewWidth / 2,
-      -this.player.center.y + viewHeight / 2
+      lerpClamped(this.worldContainer.x, xTarget, dt * cameraStiffness),
+      lerpClamped(this.worldContainer.y, yTarget, dt * cameraStiffness)
     )
   }
 
