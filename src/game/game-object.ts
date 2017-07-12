@@ -88,12 +88,14 @@ export class GameObject {
 
     if (Math.abs(dx) < Math.abs(dy)) {
       this.x += dx
-      if (this.xvel !== 0 && Math.sign(this.xvel) !== Math.sign(dx))
+      if (this.xvel !== 0 && Math.sign(this.xvel) !== Math.sign(dx)) {
         this.xvel = 0
+      }
     } else {
       this.y += dy
-      if (this.yvel !== 0 && Math.sign(this.yvel) !== Math.sign(dy))
+      if (this.yvel !== 0 && Math.sign(this.yvel) !== Math.sign(dy)) {
         this.yvel = 0
+      }
     }
   }
 }
