@@ -3,10 +3,13 @@ import * as path from 'path'
 import * as HTMLPlugin from 'html-webpack-plugin'
 
 const config: webpack.Configuration = {
-  entry: './src/main',
+  entry: {
+    app: ['./src/main'],
+    lib: ['pixi.js'],
+  },
   output: {
     path: path.resolve(__dirname, './build'),
-    filename: 'build.js',
+    filename: '[name].bundle.js',
   },
   module: {
     rules: [
@@ -26,7 +29,10 @@ const config: webpack.Configuration = {
   performance: {
     hints: false,
   },
-  plugins: [new HTMLPlugin({ template: './src/index.html' })],
+  plugins: [
+    new HTMLPlugin({ template: './src/index.html' }),
+    new webpack.optimize.CommonsChunkPlugin({ names: ['lib'] }),
+  ],
   devtool: '#source-map',
 }
 
