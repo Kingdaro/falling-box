@@ -5,7 +5,7 @@ export type InteractionEvent = pixi.interaction.InteractionEvent
 export class Game {
   private state = new GameState()
 
-  constructor(private app: pixi.Application) {
+  constructor(public app: pixi.Application) {
     app.ticker.add(dt => this.state.update(dt / 60))
 
     const interaction = new pixi.interaction.InteractionManager(app.renderer)
@@ -27,6 +27,15 @@ export class Game {
 
 export class GameState {
   game: Game
+
+  get app() {
+    return this.game.app
+  }
+
+  get stage() {
+    return this.app.stage
+  }
+
   enter() {}
   leave() {}
   update(dt: number) {}
