@@ -13,8 +13,16 @@ export class Game {
 
     app.renderer.resize(viewWidth, viewHeight)
     app.view.tabIndex = 0
-    app.view.onkeydown = event => this.state.keydown(event)
-    app.view.onkeyup = event => this.state.keyup(event)
+
+    app.view.onkeydown = event => {
+      if (event.repeat) return
+      this.state.keydown(event)
+    }
+
+    app.view.onkeyup = event => {
+      if (event.repeat) return
+      this.state.keyup(event)
+    }
 
     const interaction = new pixi.interaction.InteractionManager(app.renderer)
     interaction.addListener('pointerdown', (event: InteractionEvent) => this.state.pointerdown(event))
