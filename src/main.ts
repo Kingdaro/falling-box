@@ -4,8 +4,12 @@ import { GameplayState } from './game/gameplay'
 
 declare const module: any
 
+let app: pixi.Application
+
 function run() {
-  const app = new pixi.Application()
+  if (app) app.destroy()
+  app = new pixi.Application()
+
   const game = new Game(app)
   game.setState(new GameplayState())
   document.body.innerHTML = ''
