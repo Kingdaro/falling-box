@@ -1,8 +1,8 @@
-const path = require('path')
-const webpack = require('webpack')
-const HTMLPlugin = require('html-webpack-plugin')
+import * as webpack from 'webpack'
+import * as path from 'path'
+import * as HTMLPlugin from 'html-webpack-plugin'
 
-module.exports = {
+const config: webpack.Configuration = {
   entry: './src/main',
   output: {
     path: path.resolve(__dirname, './build'),
@@ -29,3 +29,5 @@ module.exports = {
   plugins: [new HTMLPlugin({ template: './src/index.html' })],
   devtool: '#source-map',
 }
+
+export default config

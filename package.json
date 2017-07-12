@@ -9,9 +9,12 @@
     "build": "webpack -p"
   },
   "devDependencies": {
+    "@types/html-webpack-plugin": "^2.28.0",
     "@types/pixi.js": "^4.5.1",
+    "@types/webpack": "^3.0.4",
     "html-webpack-plugin": "^2.29.0",
     "ts-loader": "^2.2.2",
+    "ts-node": "^3.2.0",
     "tslint": "^5.5.0",
     "typescript": "^2.4.1",
     "webpack": "^2.6.1",
