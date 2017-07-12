@@ -30,8 +30,6 @@ export class Player extends GameObject {
     if (this.y + this.height > viewHeight) {
       this.y = viewHeight - this.height
     }
-
-    this.updateSprite()
   }
 
   jump() {
