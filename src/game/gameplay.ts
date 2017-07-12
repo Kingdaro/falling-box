@@ -17,6 +17,7 @@ export class GameplayState extends GameState {
   playerInput = new PlayerInput(this.player)
   worldBlocks = [] as GameObject[]
   fallingBlocks = [] as FallingBlock[]
+  blockSpawnTimer = 0
 
   worldContainer = new pixi.Container()
 
@@ -25,7 +26,6 @@ export class GameplayState extends GameState {
     this.worldContainer.addChild(this.player.sprite)
     this.respawnPlayer()
     this.createWorld()
-    this.spawnFallingBlock()
   }
 
   addWorldBlock(wx: number, wy: number, wwidth: number, wheight: number) {
@@ -40,9 +40,9 @@ export class GameplayState extends GameState {
   }
 
   createWorld() {
-    this.addWorldBlock(0, 0, 20, 1)
-    this.addWorldBlock(1, 1, 18, 1)
-    this.addWorldBlock(2, 2, 16, 1)
+    this.addWorldBlock(0, 0, 30, 1)
+    this.addWorldBlock(1, 1, 28, 1)
+    this.addWorldBlock(2, 2, 26, 1)
     this.worldBlocks.forEach(b => this.worldContainer.addChild(b.sprite))
   }
 
@@ -64,12 +64,23 @@ export class GameplayState extends GameState {
     this.updateFallingBlocks(dt)
     this.updatePlayer(dt)
     this.updateCamera(dt)
+
+    this.blockSpawnTimer -= dt
+    while (this.blockSpawnTimer <= 0) {
+      this.blockSpawnTimer += 0.3
+      this.spawnFallingBlock()
+    }
   }
 
   updateFallingBlocks(dt: number) {
     this.fallingBlocks.forEach(fb => {
       fb.update(dt)
       this.worldBlocks.forEach(wb => fb.resolveCollision(wb))
+      this.fallingBlocks.forEach(other => {
+        if (fb !== other) {
+          fb.resolveCollision(other)
+        }
+      })
     })
   }
 
