@@ -1,18 +1,47 @@
+import * as pixi from 'pixi.js'
 import { createRect } from '../util/pixi'
 
 export class GameObject {
   xvel = 0
   yvel = 0
   gravity = 0
-  sprite = createRect(this.width, this.height)
+  sprite: pixi.Graphics
 
-  constructor(
-    public x: number,
-    public y: number,
-    public width: number,
-    public height = width
-  ) {
-    this.updateSprite()
+  constructor(x: number, y: number, width: number, height = width) {
+    this.sprite = createRect(width, height)
+    this.sprite.position.set(x, y)
+  }
+
+  get x() {
+    return this.sprite.x
+  }
+
+  set x(value: number) {
+    this.sprite.x = value
+  }
+
+  get y() {
+    return this.sprite.y
+  }
+
+  set y(value: number) {
+    this.sprite.y = value
+  }
+
+  get width() {
+    return this.sprite.width
+  }
+
+  set width(value: number) {
+    this.sprite.x = value
+  }
+
+  get height() {
+    return this.sprite.height
+  }
+
+  set height(value: number) {
+    this.sprite.x = value
   }
 
   get center() {
@@ -30,14 +59,9 @@ export class GameObject {
     this.y += this.yvel * dt
   }
 
-  updateSprite() {
-    this.sprite.position.set(this.x, this.y)
-  }
-
   update(dt: number) {
     this.applyGravity(dt)
     this.applyVelocity(dt)
-    this.updateSprite()
   }
 
   collidesWith(other: GameObject) {

@@ -37,11 +37,8 @@ export class GameplayState extends GameState {
 
   updatePlayer(dt: number) {
     this.player.update(dt)
-
-    this.worldBlocks.forEach(this.player.resolveCollision.bind(this.player))
-    this.fallingBlocks.forEach(this.player.resolveCollision.bind(this.player))
-
-    this.player.updateSprite()
+    this.worldBlocks.forEach(b => this.player.resolveCollision(b))
+    this.fallingBlocks.forEach(b => this.player.resolveCollision(b))
   }
 
   keydown(event: KeyboardEvent) {
