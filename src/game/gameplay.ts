@@ -7,7 +7,7 @@ import { lerpClamped, randomRange } from '../util/math'
 
 const cameraStiffness = 10
 const cameraVerticalOffset = 150
-const fallingBlockSpawnHeight = -800
+const fallingBlockSpawnHeight = -2000
 const playerSpawnHeight = -300
 const worldFalloutDepth = 1000
 const worldScale = 70
