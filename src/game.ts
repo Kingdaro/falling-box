@@ -8,9 +8,11 @@ export class Game {
   constructor(public app: pixi.Application) {
     app.ticker.add(dt => this.state.update(dt / 60))
 
+    app.view.tabIndex = 0
+    app.view.onkeydown = event => this.state.keydown(event)
+    app.view.onkeyup = event => this.state.keyup(event)
+
     const interaction = new pixi.interaction.InteractionManager(app.renderer)
-    interaction.addListener('keydown', (event: InteractionEvent) => this.state.keydown(event))
-    interaction.addListener('keyup', (event: InteractionEvent) => this.state.keyup(event))
     interaction.addListener('pointerdown', (event: InteractionEvent) => this.state.pointerdown(event))
     interaction.addListener('pointerup', (event: InteractionEvent) => this.state.pointerup(event))
     interaction.addListener('pointermove', (event: InteractionEvent) => this.state.pointermove(event))
@@ -39,8 +41,8 @@ export class GameState {
   enter() {}
   leave() {}
   update(dt: number) {}
-  keyup(event: InteractionEvent) {}
-  keydown(event: InteractionEvent) {}
+  keyup(event: KeyboardEvent) {}
+  keydown(event: KeyboardEvent) {}
   pointerdown(event: InteractionEvent) {}
   pointerup(event: InteractionEvent) {}
   pointermove(event: InteractionEvent) {}
