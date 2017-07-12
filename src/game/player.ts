@@ -1,30 +1,37 @@
 // import * as pixi from 'pixi.js'
 import { lerpClamped } from '../util/math'
-import { createRect } from '../util/pixi'
 import { viewHeight } from './game'
+import { GameObject } from './game-object'
 
-const size = 50
+const playerSize = 50
 const movementSpeed = 500
 const movementStiffness = 15
 const gravity = 2500
 const jumpStrength = 800
 
-export class Player {
-  sprite = createRect(size)
-  xvel = 0
-  yvel = 0
+export class Player extends GameObject {
   movement = 0
+  gravity = gravity
+
+  constructor() {
+    super(100, 100, playerSize)
+  }
 
   update(dt: number) {
-    this.xvel = lerpClamped(this.xvel, this.movement * movementSpeed, dt * movementStiffness)
-    this.yvel += gravity * dt
+    this.xvel = lerpClamped(
+      this.xvel,
+      this.movement * movementSpeed,
+      dt * movementStiffness
+    )
 
-    this.sprite.x += this.xvel * dt
-    this.sprite.y += this.yvel * dt
+    this.applyGravity(dt)
+    this.applyVelocity(dt)
 
-    if (this.sprite.y + this.sprite.height > viewHeight) {
-      this.sprite.y = viewHeight - this.sprite.height
+    if (this.y + this.height > viewHeight) {
+      this.y = viewHeight - this.height
     }
+
+    this.updateSprite()
   }
 
   jump() {
@@ -42,7 +49,11 @@ export class PlayerInput {
   }
 
   keyup(event: KeyboardEvent) {
-    if (event.key === 'ArrowLeft' && this.player.movement < 0) this.player.movement = 0
-    if (event.key === 'ArrowRight' && this.player.movement > 0) this.player.movement = 0
+    if (event.key === 'ArrowLeft' && this.player.movement < 0) {
+      this.player.movement = 0
+    }
+    if (event.key === 'ArrowRight' && this.player.movement > 0) {
+      this.player.movement = 0
+    }
   }
 }
