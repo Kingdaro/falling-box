@@ -2,7 +2,7 @@
 import { GameObject } from './game-object'
 
 const gravity = 1200
-const maxVelocity = 1000
+const maxVelocity = 800
 
 export class FallingBlock extends GameObject {
   gravity = gravity
