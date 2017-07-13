@@ -79,10 +79,17 @@ export class GameplayState extends GameState {
 
     for (const fb of fallingBlocks) {
       fb.update(dt)
-      for (const wb of worldBlocks) fb.resolveCollision(wb)
     }
 
-    const sortedByHeight = fallingBlocks.slice().sort((a, b) => a.y - b.y)
+    const activeFallingBlocks = fallingBlocks.filter(block => block.active)
+
+    for (const block of activeFallingBlocks) {
+      for (const worldBlock of worldBlocks) {
+        block.resolveCollision(worldBlock)
+      }
+    }
+
+    const sortedByHeight = activeFallingBlocks.slice().sort((a, b) => a.y - b.y)
     for (var i = 0; i < sortedByHeight.length; i++) {
       for (var j = i; j < sortedByHeight.length; j++) {
         const first = sortedByHeight[i]
@@ -90,6 +97,8 @@ export class GameplayState extends GameState {
         if (first !== second) first.resolveCollision(second)
       }
     }
+
+    this.fallingBlocks = this.fallingBlocks.filter(block => block.life > -1)
   }
 
   updatePlayer(dt: number) {
