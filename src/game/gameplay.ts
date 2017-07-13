@@ -43,7 +43,9 @@ export class GameplayState extends GameState {
     this.addWorldBlock(0, 0, 30, 1)
     this.addWorldBlock(1, 1, 28, 1)
     this.addWorldBlock(2, 2, 26, 1)
-    this.worldBlocks.forEach(b => this.worldContainer.addChild(b.sprite))
+    for (const { sprite } of this.worldBlocks) {
+      this.worldContainer.addChild(sprite)
+    }
   }
 
   spawnFallingBlock() {
@@ -73,15 +75,21 @@ export class GameplayState extends GameState {
   }
 
   updateFallingBlocks(dt: number) {
-    this.fallingBlocks.forEach(fb => {
+    const { fallingBlocks, worldBlocks } = this
+
+    for (const fb of fallingBlocks) {
       fb.update(dt)
-      this.worldBlocks.forEach(wb => fb.resolveCollision(wb))
-      this.fallingBlocks.forEach(other => {
-        if (fb !== other) {
-          fb.resolveCollision(other)
-        }
-      })
-    })
+      for (const wb of worldBlocks) fb.resolveCollision(wb)
+    }
+
+    const sortedByHeight = fallingBlocks.slice().sort((a, b) => a.y - b.y)
+    for (var i = 0; i < sortedByHeight.length; i++) {
+      for (var j = i; j < sortedByHeight.length; j++) {
+        const first = sortedByHeight[i]
+        const second = sortedByHeight[j]
+        if (first !== second) first.resolveCollision(second)
+      }
+    }
   }
 
   updatePlayer(dt: number) {
@@ -91,8 +99,10 @@ export class GameplayState extends GameState {
       this.respawnPlayer()
     }
 
-    this.worldBlocks.forEach(b => this.player.resolveCollision(b))
-    this.fallingBlocks.forEach(b => this.player.resolveCollision(b))
+    const blocks = this.worldBlocks.concat(this.fallingBlocks)
+    for (const b of blocks) {
+      this.player.resolveCollision(b)
+    }
   }
 
   updateCamera(dt: number) {
