@@ -108,9 +108,12 @@ export class GameplayState extends GameState {
       this.respawnPlayer()
     }
 
-    const blocks = this.worldBlocks.concat(this.fallingBlocks)
-    for (const b of blocks) {
-      this.player.resolveCollision(b)
+    const collidables = this.worldBlocks
+      .concat(this.fallingBlocks)
+      .sort((a, b) => this.player.distanceTo(a) - this.player.distanceTo(b))
+
+    for (const collidable of collidables) {
+      this.player.resolveCollision(collidable)
     }
   }
 
