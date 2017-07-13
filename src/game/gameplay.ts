@@ -43,9 +43,9 @@ export class GameplayState extends GameState {
     this.addWorldBlock(0, 0, 30, 1)
     this.addWorldBlock(1, 1, 28, 1)
     this.addWorldBlock(2, 2, 26, 1)
-    for (const { sprite } of this.worldBlocks) {
-      this.worldContainer.addChild(sprite)
-    }
+    this.worldBlocks.forEach(block =>
+      this.worldContainer.addChild(block.sprite)
+    )
   }
 
   spawnFallingBlock() {
@@ -75,19 +75,15 @@ export class GameplayState extends GameState {
   }
 
   updateFallingBlocks(dt: number) {
-    const { fallingBlocks, worldBlocks } = this
+    this.fallingBlocks.forEach(b => b.update(dt))
+    this.fallingBlocks = this.fallingBlocks.filter(block => block.life > -1)
 
-    for (const fb of fallingBlocks) {
-      fb.update(dt)
-    }
-
-    const activeFallingBlocks = fallingBlocks.filter(block => block.active)
-
-    for (const block of activeFallingBlocks) {
-      for (const worldBlock of worldBlocks) {
-        block.resolveCollision(worldBlock)
-      }
-    }
+    const activeFallingBlocks = this.fallingBlocks.filter(block => block.active)
+    activeFallingBlocks.forEach(activeBlock => {
+      this.worldBlocks.forEach(worldBlock => {
+        activeBlock.resolveCollision(worldBlock)
+      })
+    })
 
     const sortedByHeight = activeFallingBlocks.slice().sort((a, b) => a.y - b.y)
     for (var i = 0; i < sortedByHeight.length; i++) {
@@ -97,8 +93,6 @@ export class GameplayState extends GameState {
         if (first !== second) first.resolveCollision(second)
       }
     }
-
-    this.fallingBlocks = this.fallingBlocks.filter(block => block.life > -1)
   }
 
   updatePlayer(dt: number) {
@@ -108,13 +102,10 @@ export class GameplayState extends GameState {
       this.respawnPlayer()
     }
 
-    const collidables = this.worldBlocks
+    this.worldBlocks
       .concat(this.fallingBlocks)
       .sort((a, b) => this.player.distanceTo(a) - this.player.distanceTo(b))
-
-    for (const collidable of collidables) {
-      this.player.resolveCollision(collidable)
-    }
+      .forEach(collidable => this.player.resolveCollision(collidable))
   }
 
   updateCamera(dt: number) {
