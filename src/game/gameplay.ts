@@ -49,14 +49,14 @@ export class GameplayState extends GameState {
   }
 
   spawnFallingBlock() {
-    const x = randomRange(0, 19) * worldScale
+    const x = randomRange(0, 29) * worldScale
     const block = new FallingBlock(x, fallingBlockSpawnHeight, worldScale)
     this.fallingBlocks.push(block)
     this.worldContainer.addChild(block.sprite)
   }
 
   respawnPlayer() {
-    this.player.x = randomRange(0, 19) * worldScale
+    this.player.x = randomRange(0, 29) * worldScale
     this.player.y = playerSpawnHeight
     this.player.xvel = 0
     this.player.yvel = 0
