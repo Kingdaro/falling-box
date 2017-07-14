@@ -7,7 +7,7 @@ import { World, worldScale } from './world'
 const cameraStiffness = 10
 const cameraVerticalOffset = 150
 const fallingBlockSpawnHeight = -2000
-const playerSpawnHeight = -300
+const playerSpawnHeight = -500
 const worldFalloutDepth = 1000
 
 export class GameplayState extends GameState {
@@ -19,8 +19,8 @@ export class GameplayState extends GameState {
   camera = { x: 0, y: 0 }
 
   enter() {
-    this.respawnPlayer()
     this.createWorld()
+    this.respawnPlayer()
   }
 
   update(dt: number) {
@@ -55,7 +55,7 @@ export class GameplayState extends GameState {
   }
 
   respawnPlayer() {
-    this.player.x = randomRange(0, 29) * worldScale
+    this.player.x = randomRange(0, this.world.bounds.right)
     this.player.y = playerSpawnHeight
     this.player.xvel = 0
     this.player.yvel = 0
@@ -68,7 +68,10 @@ export class GameplayState extends GameState {
   }
 
   spawnFallingBlock() {
-    const x = randomRange(0, 29) * worldScale
+    const x =
+      Math.floor(randomRange(0, this.world.bounds.right) / worldScale) *
+      worldScale
+
     const block = new FallingBlock(x, fallingBlockSpawnHeight, worldScale)
     this.fallingBlocks.push(block)
   }
