@@ -39,29 +39,39 @@ export class GameObject {
     )
   }
 
-  resolveCollision(other: GameObject) {
-    if (!this.collidesWith(other)) return
-
-    const dx =
+  getDisplacement(other: GameObject) {
+    const x =
       this.center.x < other.center.x
         ? other.x - (this.x + this.width)
         : other.x + other.width - this.x
 
-    const dy =
+    const y =
       this.center.y < other.center.y
         ? other.y - (this.y + this.height)
         : other.y + other.height - this.y
 
-    if (Math.abs(dx) < Math.abs(dy)) {
-      this.x += dx
-      if (this.xvel !== 0 && Math.sign(this.xvel) !== Math.sign(dx)) {
-        this.xvel = 0
-      }
-    } else {
-      this.y += dy
-      if (this.yvel !== 0 && Math.sign(this.yvel) !== Math.sign(dy)) {
-        this.yvel = 0
-      }
+    return { x, y }
+  }
+
+  getMinimumDisplacement(other: GameObject) {
+    const { x, y } = this.getDisplacement(other)
+    return Math.abs(x) < Math.abs(y) ? { x, y: 0 } : { y, x: 0 }
+  }
+
+  resolveCollision(other: GameObject) {
+    if (!this.collidesWith(other)) return
+
+    const disp = this.getMinimumDisplacement(other)
+
+    this.x += disp.x
+    this.y += disp.y
+
+    if (disp.x !== 0 && Math.sign(this.xvel) !== Math.sign(disp.x)) {
+      this.xvel = 0
+    }
+
+    if (disp.y !== 0 && Math.sign(this.yvel) !== Math.sign(disp.y)) {
+      this.yvel = 0
     }
   }
 
