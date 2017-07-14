@@ -22,12 +22,6 @@ const config: webpack.Configuration = {
   resolve: {
     extensions: ['.js', '.ts', '.tsx'],
   },
-  devServer: {
-    noInfo: true,
-  },
-  performance: {
-    hints: false,
-  },
   plugins: [
     new HTMLPlugin({ template: './src/index.html' }),
     // new webpack.optimize.CommonsChunkPlugin({ names: ['lib'] }),
