@@ -1,21 +1,14 @@
-import * as pixi from 'pixi.js'
 import { Game } from './game/game'
 import { GameplayState } from './game/gameplay'
 
 declare const module: any
 
-let app: pixi.Application
-
 function run() {
-  if (app) app.destroy()
-  app = new pixi.Application()
-
-  const game = new Game(app)
+  const game = new Game()
   game.setState(new GameplayState())
+  game.start()
   document.body.innerHTML = ''
-  document.body.appendChild(app.view)
-  app.start()
-  app.view.focus()
+  document.body.appendChild(game.view).focus()
 }
 
 run()

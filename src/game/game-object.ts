@@ -1,48 +1,14 @@
-import * as pixi from 'pixi.js'
-import { createRect } from '../util/pixi'
-
 export class GameObject {
   xvel = 0
   yvel = 0
   gravity = 0
-  sprite: pixi.Graphics
 
-  constructor(x: number, y: number, width: number, height = width) {
-    this.sprite = createRect(width, height)
-    this.sprite.position.set(x, y)
-  }
-
-  get x() {
-    return this.sprite.x
-  }
-
-  set x(value: number) {
-    this.sprite.x = value
-  }
-
-  get y() {
-    return this.sprite.y
-  }
-
-  set y(value: number) {
-    this.sprite.y = value
-  }
-
-  get width() {
-    return this.sprite.width
-  }
-
-  set width(value: number) {
-    this.sprite.x = value
-  }
-
-  get height() {
-    return this.sprite.height
-  }
-
-  set height(value: number) {
-    this.sprite.x = value
-  }
+  constructor(
+    public x: number,
+    public y: number,
+    public width: number,
+    public height = width,
+  ) {}
 
   get center() {
     const x = this.x + this.width / 2
@@ -101,5 +67,10 @@ export class GameObject {
 
   distanceTo(other: GameObject) {
     return Math.sqrt((other.x - this.x) ** 2 + (other.y - this.y) ** 2)
+  }
+
+  draw(ctx: CanvasRenderingContext2D) {
+    ctx.fillStyle = 'white'
+    ctx.fillRect(this.x, this.y, this.width, this.height)
   }
 }
