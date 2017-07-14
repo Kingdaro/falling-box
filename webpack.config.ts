@@ -5,7 +5,6 @@ import * as HTMLPlugin from 'html-webpack-plugin'
 const config: webpack.Configuration = {
   entry: {
     app: ['./src/main'],
-    lib: ['pixi.js'],
   },
   output: {
     path: path.resolve(__dirname, './build'),
@@ -31,7 +30,7 @@ const config: webpack.Configuration = {
   },
   plugins: [
     new HTMLPlugin({ template: './src/index.html' }),
-    new webpack.optimize.CommonsChunkPlugin({ names: ['lib'] }),
+    // new webpack.optimize.CommonsChunkPlugin({ names: ['lib'] }),
     new webpack.NamedModulesPlugin(),
   ],
   devtool: '#source-map',
