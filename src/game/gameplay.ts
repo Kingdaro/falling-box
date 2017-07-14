@@ -86,8 +86,8 @@ export class GameplayState extends GameState {
     })
 
     const sortedByHeight = activeFallingBlocks.slice().sort((a, b) => a.y - b.y)
-    for (var i = 0; i < sortedByHeight.length; i++) {
-      for (var j = i; j < sortedByHeight.length; j++) {
+    for (let i = 0; i < sortedByHeight.length; i++) {
+      for (let j = i; j < sortedByHeight.length; j++) {
         const first = sortedByHeight[i]
         const second = sortedByHeight[j]
         if (first !== second) first.resolveCollision(second)
