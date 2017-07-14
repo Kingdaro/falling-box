@@ -76,7 +76,13 @@ export class GameplayState extends GameState {
 
   updateFallingBlocks(dt: number) {
     this.fallingBlocks.forEach(b => b.update(dt))
-    this.fallingBlocks = this.fallingBlocks.filter(block => block.life > -1)
+    this.fallingBlocks = this.fallingBlocks.filter(block => {
+      if (block.life < -1) {
+        block.sprite.destroy()
+        return false
+      }
+      return true
+    })
 
     const activeFallingBlocks = this.fallingBlocks.filter(block => block.active)
     activeFallingBlocks.forEach(activeBlock => {
