@@ -1,20 +1,19 @@
 import { GameState, viewWidth, viewHeight } from './game'
 import { Player, PlayerInput } from './player'
 import { FallingBlock } from './falling-block'
-import { GameObject } from './game-object'
 import { lerpClamped, randomRange } from '../util/math'
+import { World, worldScale } from './world'
 
 const cameraStiffness = 10
 const cameraVerticalOffset = 150
 const fallingBlockSpawnHeight = -2000
 const playerSpawnHeight = -300
 const worldFalloutDepth = 1000
-const worldScale = 70
 
 export class GameplayState extends GameState {
   player = new Player()
   playerInput = new PlayerInput(this.player)
-  worldBlocks = [] as GameObject[]
+  world = new World()
   fallingBlocks = [] as FallingBlock[]
   blockSpawnTimer = 0
   camera = { x: 0, y: 0 }
@@ -50,7 +49,7 @@ export class GameplayState extends GameState {
     ctx.save()
     ctx.translate(Math.round(this.camera.x), Math.round(this.camera.y))
     this.player.draw(ctx)
-    this.worldBlocks.forEach(b => b.draw(ctx))
+    this.world.draw(ctx)
     this.fallingBlocks.forEach(b => b.draw(ctx))
     ctx.restore()
   }
@@ -63,20 +62,9 @@ export class GameplayState extends GameState {
   }
 
   createWorld() {
-    this.addWorldBlock(0, 0, 30, 1)
-    this.addWorldBlock(1, 1, 28, 1)
-    this.addWorldBlock(2, 2, 26, 1)
-  }
-
-  addWorldBlock(wx: number, wy: number, wwidth: number, wheight: number) {
-    this.worldBlocks.push(
-      new GameObject(
-        wx * worldScale,
-        wy * worldScale,
-        wwidth * worldScale,
-        wheight * worldScale,
-      ),
-    )
+    this.world.addBlock(0, 0, 30, 1)
+    this.world.addBlock(1, 1, 28, 1)
+    this.world.addBlock(2, 2, 26, 1)
   }
 
   spawnFallingBlock() {
@@ -91,7 +79,7 @@ export class GameplayState extends GameState {
 
     const activeFallingBlocks = this.fallingBlocks.filter(block => block.active)
     activeFallingBlocks.forEach(activeBlock => {
-      this.worldBlocks.forEach(worldBlock => {
+      this.world.blocks.forEach(worldBlock => {
         activeBlock.resolveCollision(worldBlock)
       })
     })
@@ -113,7 +101,7 @@ export class GameplayState extends GameState {
       this.respawnPlayer()
     }
 
-    this.worldBlocks
+    this.world.blocks
       .concat(this.fallingBlocks)
       .sort((a, b) => this.player.distanceTo(a) - this.player.distanceTo(b))
       .forEach(collidable => this.player.resolveCollision(collidable))
