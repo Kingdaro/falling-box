@@ -59,7 +59,7 @@ export class GameObject {
   }
 
   resolveCollision(other: GameObject) {
-    if (!this.collidesWith(other)) return
+    if (!this.collidesWith(other)) return false
 
     const disp = this.getMinimumDisplacement(other)
 
@@ -73,6 +73,8 @@ export class GameObject {
     if (disp.y !== 0 && Math.sign(this.yvel) !== Math.sign(disp.y)) {
       this.yvel = 0
     }
+
+    return true
   }
 
   distanceTo(other: GameObject) {

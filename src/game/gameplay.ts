@@ -73,8 +73,7 @@ export class GameplayState extends GameState {
       .filter(block => block.state === FallingBlockState.falling)
       .forEach(block => {
         collidables.forEach(other => {
-          if (block.collidesWith(other)) {
-            block.resolveCollision(other)
+          if (block.resolveCollision(other)) {
             block.state = FallingBlockState.frozen
           }
         })
