@@ -1,5 +1,5 @@
 function animationFrame() {
-  return new Promise<number>(requestAnimationFrame)
+  return new Promise(requestAnimationFrame)
 }
 
 export const viewWidth = 1280
