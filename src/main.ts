@@ -3,8 +3,11 @@ import { GameplayState } from './game/gameplay'
 
 declare const module: any
 
+let game: Game
+
 function run() {
-  const game = new Game()
+  if (game) game.stop()
+  game = new Game()
   game.setState(new GameplayState())
   game.start()
   document.body.innerHTML = ''

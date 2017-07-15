@@ -9,6 +9,7 @@ export class Game {
   view = document.createElement('canvas')
   private renderer = this.view.getContext('2d')
   private state = new GameState()
+  private running = false
 
   constructor() {
     this.view.style.backgroundColor = 'black'
@@ -33,14 +34,21 @@ export class Game {
     }
 
     let currentTime = await animationFrame()
-    while (true) {
+    this.running = true
+
+    while (this.running) {
       const frameTime = await animationFrame()
       const elapsed = (frameTime - currentTime) / 1000
       currentTime = frameTime
+
       this.state.update(elapsed)
       this.renderer.clearRect(0, 0, this.view.width, this.view.height)
       this.state.draw(this.renderer)
     }
+  }
+
+  stop() {
+    this.running = false
   }
 
   setState(state: GameState) {
