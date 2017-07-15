@@ -68,13 +68,8 @@ export class GameplayState extends GameState {
 
     this.fallingBlocks
       .filter(block => block.state === FallingBlockState.falling)
-      .forEach(block => {
-        collidables.forEach(other => {
-          if (block.resolveCollision(other)) {
-            block.state = FallingBlockState.frozen
-          }
-        })
-      })
+      .filter(block => block.resolveGroupCollision(collidables))
+      .forEach(block => (block.state = FallingBlockState.frozen))
   }
 
   updatePlayer(dt: number) {
@@ -84,10 +79,11 @@ export class GameplayState extends GameState {
       this.respawnPlayer()
     }
 
-    this.world.blocks
-      .concat(this.fallingBlocks.filter(block => block.isSolid))
-      .sort((a, b) => this.player.distanceTo(a) - this.player.distanceTo(b))
-      .forEach(collidable => this.player.resolveCollision(collidable))
+    const collidables = this.world.blocks.concat(
+      this.fallingBlocks.filter(block => block.isSolid),
+    )
+
+    this.player.resolveGroupCollision(collidables)
   }
 
   updateCamera(dt: number) {

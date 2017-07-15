@@ -77,6 +77,13 @@ export class GameObject {
     return true
   }
 
+  resolveGroupCollision(others: GameObject[]) {
+    const resolved = Array.from(others)
+      .sort((a, b) => this.distanceTo(a) - this.distanceTo(b))
+      .filter(other => this.resolveCollision(other))
+    return resolved.length > 0
+  }
+
   distanceTo(other: GameObject) {
     return Math.sqrt((other.x - this.x) ** 2 + (other.y - this.y) ** 2)
   }
