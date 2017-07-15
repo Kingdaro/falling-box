@@ -16,10 +16,7 @@ export class FallingBlock extends GameObject {
   life = 10
 
   update(dt: number) {
-    if (
-      this.state === FallingBlockState.falling ||
-      this.state === FallingBlockState.leaving
-    ) {
+    if (this.hasVelocity) {
       this.applyGravity(dt)
       this.yvel = Math.min(this.yvel, maxVelocity)
       this.applyVelocity(dt)
@@ -35,6 +32,13 @@ export class FallingBlock extends GameObject {
     return (
       this.state === FallingBlockState.falling ||
       this.state === FallingBlockState.frozen
+    )
+  }
+
+  get hasVelocity() {
+    return (
+      this.state === FallingBlockState.falling ||
+      this.state === FallingBlockState.leaving
     )
   }
 }
