@@ -28,6 +28,10 @@ export class FallingBlock extends GameObject {
     }
   }
 
+  get isFrozen() {
+    return this.state === FallingBlockState.frozen
+  }
+
   get isSolid() {
     return (
       this.state === FallingBlockState.falling ||
