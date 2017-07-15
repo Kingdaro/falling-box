@@ -1,6 +1,7 @@
 // import * as pixi from 'pixi.js'
 import { lerpClamped } from '../util/math'
 import { GameObject } from './game-object'
+import { FallingBlock } from './falling-block'
 
 const playerSize = 50
 const movementSpeed = 500
@@ -20,7 +21,7 @@ export class Player extends GameObject {
     this.xvel = lerpClamped(
       this.xvel,
       this.movement * movementSpeed,
-      dt * movementStiffness
+      dt * movementStiffness,
     )
 
     this.applyGravity(dt)
@@ -29,6 +30,18 @@ export class Player extends GameObject {
 
   jump() {
     this.yvel = -jumpStrength
+  }
+
+  checkSquish(blocks: FallingBlock[]) {
+    return blocks.filter(block => block.isFalling).some(block => {
+      const disp = this.getDisplacement(block)
+      const collides = this.collidesWith(block)
+      return (
+        collides &&
+        Math.abs(disp.x) > this.width * 0.8 &&
+        Math.abs(disp.y) > this.height / 2
+      )
+    })
   }
 }
 

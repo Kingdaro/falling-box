@@ -79,11 +79,14 @@ export class GameplayState extends GameState {
       this.respawnPlayer()
     }
 
-    const collidables = this.world.blocks.concat(
-      this.fallingBlocks.filter(block => block.isSolid),
-    )
-
-    this.player.resolveGroupCollision(collidables)
+    if (this.player.checkSquish(this.fallingBlocks)) {
+      this.respawnPlayer()
+    } else {
+      const collidables = this.world.blocks.concat(
+        this.fallingBlocks.filter(block => block.isFrozen),
+      )
+      this.player.resolveGroupCollision(collidables)
+    }
   }
 
   updateCamera(dt: number) {
