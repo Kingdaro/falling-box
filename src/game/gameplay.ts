@@ -1,8 +1,9 @@
 import { GameState, viewWidth, viewHeight } from './game'
 import { Player, PlayerInput } from './player'
 import { FallingBlock } from './falling-block'
-import { lerpClamped, randomRange } from '../util/math'
+import { randomRange } from '../util/math'
 import { World, worldScale } from './world'
+import { Camera } from './camera'
 
 const cameraStiffness = 10
 const cameraVerticalOffset = 150
@@ -16,7 +17,7 @@ export class GameplayState extends GameState {
   world = new World()
   fallingBlocks = [] as FallingBlock[]
   blockSpawnTimer = 0
-  camera = { x: 0, y: 0 }
+  camera = new Camera()
 
   enter() {
     this.createWorld()
@@ -46,12 +47,11 @@ export class GameplayState extends GameState {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    ctx.save()
-    ctx.translate(Math.round(this.camera.x), Math.round(this.camera.y))
-    this.player.draw(ctx)
-    this.world.draw(ctx)
-    this.fallingBlocks.forEach(b => b.draw(ctx))
-    ctx.restore()
+    this.camera.applyTransform(ctx, () => {
+      this.player.draw(ctx)
+      this.world.draw(ctx)
+      this.fallingBlocks.forEach(b => b.draw(ctx))
+    })
   }
 
   respawnPlayer() {
@@ -111,11 +111,8 @@ export class GameplayState extends GameState {
   }
 
   updateCamera(dt: number) {
-    const xTarget = -this.player.center.x + viewWidth / 2
-    const yTarget =
-      -this.player.center.y + viewHeight / 2 + cameraVerticalOffset
-
-    this.camera.x = lerpClamped(this.camera.x, xTarget, dt * cameraStiffness)
-    this.camera.y = lerpClamped(this.camera.y, yTarget, dt * cameraStiffness)
+    const x = -this.player.center.x + viewWidth / 2
+    const y = -this.player.center.y + viewHeight / 2 + cameraVerticalOffset
+    this.camera.panTo(x, y, dt * cameraStiffness)
   }
 }
