@@ -2,8 +2,10 @@ import { GameObject } from './game-object'
 
 export const worldScale = 70
 
+export class WorldBlock extends GameObject {}
+
 export class World {
-  blocks = [] as GameObject[]
+  blocks = [] as WorldBlock[]
 
   bounds = {
     left: 0,
@@ -14,7 +16,7 @@ export class World {
 
   addBlock(wx: number, wy: number, wwidth: number, wheight: number) {
     this.blocks.push(
-      new GameObject(
+      new WorldBlock(
         wx * worldScale,
         wy * worldScale,
         wwidth * worldScale,
