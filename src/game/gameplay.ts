@@ -63,29 +63,21 @@ export class GameplayState extends GameState {
     this.fallingBlocks.forEach(b => b.update(dt))
     this.fallingBlocks = this.fallingBlocks.filter(block => block.life > -1)
 
-    this.fallingBlocks
-      .filter(block => block.state === FallingBlockState.falling)
-      .forEach(block => {
-        this.world.blocks.forEach(worldBlock => {
-          if (block.collidesWith(worldBlock)) {
-            block.resolveCollision(worldBlock)
-            block.state = FallingBlockState.frozen
-          }
-        })
-      })
+    const frozenBlocks = this.fallingBlocks.filter(
+      block => block.state === FallingBlockState.frozen,
+    )
+
+    const collidables = this.world.blocks.concat(frozenBlocks)
 
     this.fallingBlocks
       .filter(block => block.state === FallingBlockState.falling)
-      // .sort((a, b) => a.y - b.y)
       .forEach(block => {
-        this.fallingBlocks
-          .filter(block => block.state === FallingBlockState.frozen)
-          .forEach(other => {
-            if (block.collidesWith(other)) {
-              block.resolveCollision(other)
-              block.state = FallingBlockState.frozen
-            }
-          })
+        collidables.forEach(other => {
+          if (block.collidesWith(other)) {
+            block.resolveCollision(other)
+            block.state = FallingBlockState.frozen
+          }
+        })
       })
   }
 
