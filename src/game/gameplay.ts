@@ -4,6 +4,7 @@ import { FallingBlock } from './falling-block'
 import { randomRange } from '../util/math'
 import { World, worldScale } from './world'
 import { Camera } from './camera'
+import { Timer } from './timer'
 
 const cameraStiffness = 10
 const cameraVerticalOffset = 150
@@ -16,8 +17,8 @@ export class GameplayState extends GameState {
   playerInput = new PlayerInput(this.player)
   world = new World()
   fallingBlocks = [] as FallingBlock[]
-  blockSpawnTimer = 0
   camera = new Camera()
+  blockSpawnTimer = new Timer(0.5)
 
   enter() {
     this.createWorld()
@@ -31,9 +32,7 @@ export class GameplayState extends GameState {
     this.updatePlayer(dt)
     this.updateCamera(dt)
 
-    this.blockSpawnTimer -= dt
-    while (this.blockSpawnTimer <= 0) {
-      this.blockSpawnTimer += 0.3
+    while (this.blockSpawnTimer.update(dt)) {
       this.spawnFallingBlock()
     }
   }
