@@ -25,6 +25,28 @@ export class GameplayState extends GameState {
     this.respawnPlayer()
   }
 
+  createWorld() {
+    this.world.addBlock(0, 0, 30, 1)
+    this.world.addBlock(1, 1, 28, 1)
+    this.world.addBlock(2, 2, 26, 1)
+  }
+
+  respawnPlayer() {
+    this.player.x = randomRange(0, this.world.bounds.right)
+    this.player.y = playerSpawnHeight
+    this.player.xvel = 0
+    this.player.yvel = 0
+  }
+
+  spawnFallingBlock() {
+    const x =
+      Math.floor(randomRange(0, this.world.bounds.right) / worldScale) *
+      worldScale
+
+    const block = new FallingBlock(x, fallingBlockSpawnHeight, worldScale)
+    this.fallingBlocks.push(block)
+  }
+
   update(dt: number) {
     if (dt > 0.5) return
 
@@ -35,44 +57,6 @@ export class GameplayState extends GameState {
     while (this.blockSpawnTimer.update(dt)) {
       this.spawnFallingBlock()
     }
-  }
-
-  keydown(event: KeyboardEvent) {
-    this.playerInput.keydown(event)
-  }
-
-  keyup(event: KeyboardEvent) {
-    this.playerInput.keyup(event)
-  }
-
-  draw(ctx: CanvasRenderingContext2D) {
-    this.camera.applyTransform(ctx, () => {
-      this.player.draw(ctx)
-      this.world.draw(ctx)
-      this.fallingBlocks.forEach(b => b.draw(ctx))
-    })
-  }
-
-  respawnPlayer() {
-    this.player.x = randomRange(0, this.world.bounds.right)
-    this.player.y = playerSpawnHeight
-    this.player.xvel = 0
-    this.player.yvel = 0
-  }
-
-  createWorld() {
-    this.world.addBlock(0, 0, 30, 1)
-    this.world.addBlock(1, 1, 28, 1)
-    this.world.addBlock(2, 2, 26, 1)
-  }
-
-  spawnFallingBlock() {
-    const x =
-      Math.floor(randomRange(0, this.world.bounds.right) / worldScale) *
-      worldScale
-
-    const block = new FallingBlock(x, fallingBlockSpawnHeight, worldScale)
-    this.fallingBlocks.push(block)
   }
 
   updateFallingBlocks(dt: number) {
@@ -113,5 +97,21 @@ export class GameplayState extends GameState {
     const x = -this.player.center.x + viewWidth / 2
     const y = -this.player.center.y + viewHeight / 2 + cameraVerticalOffset
     this.camera.panTo(x, y, dt * cameraStiffness)
+  }
+
+  keydown(event: KeyboardEvent) {
+    this.playerInput.keydown(event)
+  }
+
+  keyup(event: KeyboardEvent) {
+    this.playerInput.keyup(event)
+  }
+
+  draw(ctx: CanvasRenderingContext2D) {
+    this.camera.applyTransform(ctx, () => {
+      this.player.draw(ctx)
+      this.world.draw(ctx)
+      this.fallingBlocks.forEach(b => b.draw(ctx))
+    })
   }
 }
