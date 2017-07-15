@@ -40,6 +40,8 @@ export class GameObject {
   }
 
   getDisplacement(other: GameObject) {
+    if (!this.collidesWith(other)) return { x: 0, y: 0 }
+
     const x =
       this.center.x < other.center.x
         ? other.x - (this.x + this.width)
