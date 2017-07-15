@@ -1,6 +1,6 @@
 import { GameState, viewWidth, viewHeight } from './game'
 import { Player, PlayerInput } from './player'
-import { FallingBlock } from './falling-block'
+import { FallingBlock, FallingBlockState } from './falling-block'
 import { randomRange } from '../util/math'
 import { World, worldScale } from './world'
 import { Camera } from './camera'
@@ -63,21 +63,30 @@ export class GameplayState extends GameState {
     this.fallingBlocks.forEach(b => b.update(dt))
     this.fallingBlocks = this.fallingBlocks.filter(block => block.life > -1)
 
-    const activeFallingBlocks = this.fallingBlocks.filter(block => block.active)
-    activeFallingBlocks.forEach(activeBlock => {
-      this.world.blocks.forEach(worldBlock => {
-        activeBlock.resolveCollision(worldBlock)
+    this.fallingBlocks
+      .filter(block => block.state === FallingBlockState.falling)
+      .forEach(block => {
+        this.world.blocks.forEach(worldBlock => {
+          if (block.collidesWith(worldBlock)) {
+            block.resolveCollision(worldBlock)
+            block.state = FallingBlockState.frozen
+          }
+        })
       })
-    })
 
-    const sortedByHeight = activeFallingBlocks.slice().sort((a, b) => a.y - b.y)
-    for (let i = 0; i < sortedByHeight.length; i++) {
-      for (let j = i; j < sortedByHeight.length; j++) {
-        const first = sortedByHeight[i]
-        const second = sortedByHeight[j]
-        if (first !== second) first.resolveCollision(second)
-      }
-    }
+    this.fallingBlocks
+      .filter(block => block.state === FallingBlockState.falling)
+      // .sort((a, b) => a.y - b.y)
+      .forEach(block => {
+        this.fallingBlocks
+          .filter(block => block.state === FallingBlockState.frozen)
+          .forEach(other => {
+            if (block.collidesWith(other)) {
+              block.resolveCollision(other)
+              block.state = FallingBlockState.frozen
+            }
+          })
+      })
   }
 
   updatePlayer(dt: number) {
@@ -88,7 +97,7 @@ export class GameplayState extends GameState {
     }
 
     this.world.blocks
-      .concat(this.fallingBlocks)
+      .concat(this.fallingBlocks.filter(block => block.isSolid))
       .sort((a, b) => this.player.distanceTo(a) - this.player.distanceTo(b))
       .forEach(collidable => this.player.resolveCollision(collidable))
   }
