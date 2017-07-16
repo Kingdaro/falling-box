@@ -29,6 +29,7 @@ export class GameplayState extends GameState {
     this.world.addBlock(0, 0, 30, 1)
     this.world.addBlock(1, 1, 28, 1)
     this.world.addBlock(2, 2, 26, 1)
+    this.world.calculateBounds()
   }
 
   respawnPlayer() {

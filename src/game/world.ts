@@ -23,7 +23,6 @@ export class World {
         wheight * worldScale,
       ),
     )
-    this.calculateBounds()
   }
 
   calculateBounds() {
