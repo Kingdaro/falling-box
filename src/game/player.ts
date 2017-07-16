@@ -1,4 +1,3 @@
-// import * as pixi from 'pixi.js'
 import { lerpClamped } from '../util/math'
 import { GameObject } from './game-object'
 import { FallingBlock } from './falling-block'
