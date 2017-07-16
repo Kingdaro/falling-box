@@ -9,6 +9,7 @@ const gravity = 2500
 const jumpStrength = 800
 
 export class Player extends GameObject {
+  direction = 1
   movement = 0
   gravity = gravity
 
@@ -19,7 +20,7 @@ export class Player extends GameObject {
   update(dt: number) {
     this.xvel = lerpClamped(
       this.xvel,
-      this.movement * movementSpeed,
+      this.direction * this.movement * movementSpeed,
       dt * movementStiffness,
     )
 
@@ -48,16 +49,25 @@ export class PlayerInput {
   constructor(private player: Player) {}
 
   keydown(event: KeyboardEvent) {
-    if (event.key === 'ArrowUp') this.player.jump()
-    if (event.key === 'ArrowLeft') this.player.movement = -1
-    if (event.key === 'ArrowRight') this.player.movement = 1
+    const { player } = this
+    if (event.key === 'ArrowLeft') {
+      player.direction = -1
+      player.movement = 1
+    }
+    if (event.key === 'ArrowRight') {
+      player.direction = 1
+      player.movement = 1
+    }
+    if (event.key === 'ArrowUp') {
+      player.jump()
+    }
   }
 
   keyup(event: KeyboardEvent) {
-    if (event.key === 'ArrowLeft' && this.player.movement < 0) {
+    if (event.key === 'ArrowLeft' && this.player.direction < 0) {
       this.player.movement = 0
     }
-    if (event.key === 'ArrowRight' && this.player.movement > 0) {
+    if (event.key === 'ArrowRight' && this.player.direction > 0) {
       this.player.movement = 0
     }
   }
