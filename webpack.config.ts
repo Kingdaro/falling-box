@@ -24,7 +24,6 @@ const config: webpack.Configuration = {
   },
   plugins: [
     new HTMLPlugin({ template: './src/index.html' }),
-    // new webpack.optimize.CommonsChunkPlugin({ names: ['lib'] }),
     new webpack.NamedModulesPlugin(),
   ],
   devtool: '#source-map',
