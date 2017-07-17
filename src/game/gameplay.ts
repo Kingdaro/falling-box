@@ -1,7 +1,7 @@
 import { GameState, viewWidth, viewHeight } from './game'
 import { Player, PlayerInput } from './player'
 import { FallingBlock, FallingBlockState } from './falling-block'
-import { randomRange } from '../util/math'
+import { randomRange, roundTo } from '../util/math'
 import { World, worldScale } from './world'
 import { Camera } from './camera'
 import { Timer } from './timer'
@@ -11,6 +11,10 @@ const cameraVerticalOffset = 150
 const fallingBlockSpawnHeight = -2000
 const playerSpawnHeight = -500
 const worldFalloutDepth = 1000
+
+enum KeyCode {
+  z = 90,
+}
 
 export class GameplayState extends GameState {
   player = new Player()
@@ -44,7 +48,7 @@ export class GameplayState extends GameState {
       Math.floor(randomRange(0, this.world.bounds.right) / worldScale) *
       worldScale
 
-    const block = new FallingBlock(x, fallingBlockSpawnHeight, worldScale)
+    const block = new FallingBlock(x, fallingBlockSpawnHeight)
     this.fallingBlocks.push(block)
   }
 
@@ -98,10 +102,35 @@ export class GameplayState extends GameState {
 
   keydown(event: KeyboardEvent) {
     this.playerInput.keydown(event)
+
+    if (event.keyCode === KeyCode.z) {
+      if (!this.player.holdingBlock) {
+        const { x, y } = this.player.grabPosition
+        const index = this.fallingBlocks.findIndex(block =>
+          block.testPoint(x, y),
+        )
+        if (index > -1) {
+          this.fallingBlocks.splice(index, 1)
+          this.player.holdingBlock = true
+        }
+      }
+    }
   }
 
   keyup(event: KeyboardEvent) {
     this.playerInput.keyup(event)
+
+    if (event.keyCode === KeyCode.z) {
+      if (this.player.holdingBlock) {
+        this.player.holdingBlock = false
+        this.fallingBlocks.push(
+          new FallingBlock(
+            roundTo(this.player.grabPosition.x - worldScale / 2, worldScale),
+            this.player.grabPosition.y - worldScale / 2,
+          ),
+        )
+      }
+    }
   }
 
   draw(ctx: CanvasRenderingContext2D) {
