@@ -100,20 +100,30 @@ export class GameplayState extends GameState {
     this.camera.panTo(x, y, dt * cameraStiffness)
   }
 
+  handleBlockGrab(player: Player) {
+    if (!player.holdingBlock) {
+      const index = player.findGrabbedBlock(this.fallingBlocks)
+      if (index > -1) {
+        this.fallingBlocks.splice(index, 1)
+        player.holdingBlock = true
+      }
+    }
+  }
+
+  handleBlockRelease(player: Player) {
+    if (player.holdingBlock) {
+      const x = roundTo(player.grabPosition.x - worldScale / 2, worldScale)
+      const y = player.grabPosition.y - worldScale / 2
+      this.fallingBlocks.push(new FallingBlock(x, y))
+      player.holdingBlock = false
+    }
+  }
+
   keydown(event: KeyboardEvent) {
     this.playerInput.keydown(event)
 
     if (event.keyCode === KeyCode.z) {
-      if (!this.player.holdingBlock) {
-        const { x, y } = this.player.grabPosition
-        const index = this.fallingBlocks.findIndex(block =>
-          block.testPoint(x, y),
-        )
-        if (index > -1) {
-          this.fallingBlocks.splice(index, 1)
-          this.player.holdingBlock = true
-        }
-      }
+      this.handleBlockGrab(this.player)
     }
   }
 
@@ -121,15 +131,7 @@ export class GameplayState extends GameState {
     this.playerInput.keyup(event)
 
     if (event.keyCode === KeyCode.z) {
-      if (this.player.holdingBlock) {
-        this.player.holdingBlock = false
-        this.fallingBlocks.push(
-          new FallingBlock(
-            roundTo(this.player.grabPosition.x - worldScale / 2, worldScale),
-            this.player.grabPosition.y - worldScale / 2,
-          ),
-        )
-      }
+      this.handleBlockRelease(this.player)
     }
   }
 

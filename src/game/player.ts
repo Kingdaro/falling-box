@@ -39,6 +39,11 @@ export class Player extends GameObject {
     this.yvel = -jumpStrength
   }
 
+  findGrabbedBlock(blocks: FallingBlock[]) {
+    const { x, y } = this.grabPosition
+    return blocks.findIndex(block => block.testPoint(x, y))
+  }
+
   checkSquish(blocks: FallingBlock[]) {
     return blocks.filter(block => block.isFalling).some(block => {
       const disp = this.getDisplacement(block)
