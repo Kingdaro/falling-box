@@ -43,6 +43,20 @@ export class Player extends GameObject {
       )
     })
   }
+
+  draw(graphics: CanvasRenderingContext2D) {
+    super.draw(graphics)
+    this.drawDirectionalIndicator(graphics)
+  }
+
+  drawDirectionalIndicator(graphics: CanvasRenderingContext2D) {
+    const x = this.center.x + (this.width / 2 + 25) * this.direction
+    const y = this.center.y
+    graphics.fillStyle = 'white'
+    graphics.beginPath()
+    graphics.arc(x, y, 4, 0, Math.PI * 2)
+    graphics.fill()
+  }
 }
 
 export class PlayerInput {
