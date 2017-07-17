@@ -11,11 +11,6 @@ const cameraVerticalOffset = 150
 const fallingBlockSpawnHeight = -2000
 const playerSpawnHeight = -500
 const worldFalloutDepth = 1000
-
-enum KeyCode {
-  z = 90,
-}
-
 export class GameplayState extends GameState {
   player = new Player()
   playerInput = new PlayerInput(this.player)
@@ -122,7 +117,7 @@ export class GameplayState extends GameState {
   keydown(event: KeyboardEvent) {
     this.playerInput.keydown(event)
 
-    if (event.keyCode === KeyCode.z) {
+    if (event.key === 'z') {
       this.handleBlockGrab(this.player)
     }
   }
@@ -130,7 +125,7 @@ export class GameplayState extends GameState {
   keyup(event: KeyboardEvent) {
     this.playerInput.keyup(event)
 
-    if (event.keyCode === KeyCode.z) {
+    if (event.key === 'z') {
       this.handleBlockRelease(this.player)
     }
   }
