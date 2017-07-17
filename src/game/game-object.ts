@@ -90,6 +90,15 @@ export class GameObject {
     return Math.sqrt((other.x - this.x) ** 2 + (other.y - this.y) ** 2)
   }
 
+  testPoint(x: number, y: number) {
+    return (
+      x > this.x &&
+      x < this.x + this.width &&
+      y > this.y &&
+      y < this.y + this.height
+    )
+  }
+
   draw(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = 'white'
     ctx.fillRect(this.x, this.y, this.width, this.height)
