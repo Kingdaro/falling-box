@@ -14,7 +14,7 @@ export enum FallingBlockState {
 export class FallingBlock extends GameObject {
   gravity = gravity
   state = FallingBlockState.falling
-  life = 10
+  life = 15
 
   constructor(x: number, y: number) {
     super(x, y, worldScale)
