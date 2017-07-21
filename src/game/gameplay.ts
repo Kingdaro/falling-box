@@ -78,6 +78,14 @@ export class GameplayState extends GameState {
   updateFlyingBlocks(dt: number) {
     this.flyingBlocks.forEach(b => b.update(dt))
     this.flyingBlocks = this.flyingBlocks.filter(b => b.life > 0)
+
+    this.flyingBlocks.forEach(flying => {
+      this.fallingBlocks.forEach(falling => {
+        if (flying.collidesWith(falling)) {
+          falling.life = -1
+        }
+      })
+    })
   }
 
   updatePlayer(dt: number) {
