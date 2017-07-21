@@ -1,5 +1,6 @@
 import { GameObject } from './game-object'
 import { worldScale } from './world'
+import { FallingBlock } from './falling-block'
 
 const speed = 1000
 
@@ -18,6 +19,19 @@ export class FlyingBlock extends GameObject {
     if (this.freezeTime <= 0) {
       super.update(dt)
       this.life -= dt
+    }
+  }
+
+  handleCollisions(fallingBlocks: FallingBlock[]) {
+    const flying = this
+    if (flying.hits > 0 && flying.freezeTime <= 0) {
+      const collidables = fallingBlocks
+      const hit = collidables.find(falling => flying.collidesWith(falling))
+      if (hit != null) {
+        hit.life = -1
+        flying.hits -= 1
+        flying.freezeTime = 0.1
+      }
     }
   }
 
