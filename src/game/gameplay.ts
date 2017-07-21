@@ -5,6 +5,7 @@ import { randomRange, roundTo } from '../util/math'
 import { World, worldScale } from './world'
 import { Camera } from './camera'
 import { Timer } from './timer'
+import { FlyingBlock } from './flying-block'
 
 const cameraStiffness = 10
 const cameraVerticalOffset = 150
@@ -16,6 +17,7 @@ export class GameplayState extends GameState {
   playerInput = new PlayerInput(this.player)
   world = new World()
   fallingBlocks = [] as FallingBlock[]
+  flyingBlocks = [] as FlyingBlock[]
   camera = new Camera()
   blockSpawnTimer = new Timer(0.5)
 
@@ -51,6 +53,7 @@ export class GameplayState extends GameState {
     if (dt > 0.5) return
 
     this.updateFallingBlocks(dt)
+    this.updateFlyingBlocks(dt)
     this.updatePlayer(dt)
     this.updateCamera(dt)
 
@@ -70,6 +73,10 @@ export class GameplayState extends GameState {
       .filter(block => block.state === FallingBlockState.falling)
       .filter(block => block.resolveGroupCollision(collidables))
       .forEach(block => (block.state = FallingBlockState.frozen))
+  }
+
+  updateFlyingBlocks(dt: number) {
+    this.flyingBlocks.forEach(b => b.update(dt))
   }
 
   updatePlayer(dt: number) {
@@ -107,9 +114,9 @@ export class GameplayState extends GameState {
 
   handleBlockRelease(player: Player) {
     if (player.holdingBlock) {
-      const x = roundTo(player.grabPosition.x - worldScale / 2, worldScale)
+      const x = player.grabPosition.x - worldScale / 2
       const y = player.grabPosition.y - worldScale / 2
-      this.fallingBlocks.push(new FallingBlock(x, y))
+      this.flyingBlocks.push(new FlyingBlock(x, y, player.direction))
       player.holdingBlock = false
     }
   }
@@ -135,6 +142,7 @@ export class GameplayState extends GameState {
       this.player.draw(ctx)
       this.world.draw(ctx)
       this.fallingBlocks.forEach(b => b.draw(ctx))
+      this.flyingBlocks.forEach(b => b.draw(ctx))
     })
   }
 }
