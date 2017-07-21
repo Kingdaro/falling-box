@@ -5,6 +5,7 @@ const speed = 1000
 
 export class FlyingBlock extends GameObject {
   life = 2
+  hits = 3
 
   constructor(x: number, y: number, direction: number) {
     super(x, y, worldScale)
