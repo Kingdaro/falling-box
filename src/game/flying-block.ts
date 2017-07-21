@@ -23,14 +23,12 @@ export class FlyingBlock extends GameObject {
   }
 
   handleCollisions(fallingBlocks: FallingBlock[]) {
-    const flying = this
-    if (flying.hits > 0 && flying.freezeTime <= 0) {
-      const collidables = fallingBlocks
-      const hit = collidables.find(falling => flying.collidesWith(falling))
+    if (this.hits > 0 && this.freezeTime <= 0) {
+      const hit = fallingBlocks.find(falling => this.collidesWith(falling))
       if (hit != null) {
         hit.life = -1
-        flying.hits -= 1
-        flying.freezeTime = 0.1
+        this.hits -= 1
+        this.freezeTime = 0.1
       }
     }
   }
