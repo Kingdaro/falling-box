@@ -77,6 +77,7 @@ export class GameplayState extends GameState {
 
   updateFlyingBlocks(dt: number) {
     this.flyingBlocks.forEach(b => b.update(dt))
+    this.flyingBlocks = this.flyingBlocks.filter(b => b.life > 0)
   }
 
   updatePlayer(dt: number) {
