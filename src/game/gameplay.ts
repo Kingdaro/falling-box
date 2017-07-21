@@ -81,9 +81,14 @@ export class GameplayState extends GameState {
 
     this.flyingBlocks.forEach(flying => {
       this.fallingBlocks.forEach(falling => {
-        if (flying.collidesWith(falling) && flying.hits > 0) {
+        if (
+          flying.collidesWith(falling) &&
+          flying.hits > 0 &&
+          flying.freezeTime <= 0
+        ) {
           falling.life = -1
           flying.hits -= 1
+          flying.freezeTime = 0.1
         }
       })
     })

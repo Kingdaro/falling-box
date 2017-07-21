@@ -6,6 +6,7 @@ const speed = 1000
 export class FlyingBlock extends GameObject {
   life = 2
   hits = 3
+  freezeTime = 0
 
   constructor(x: number, y: number, direction: number) {
     super(x, y, worldScale)
@@ -13,8 +14,11 @@ export class FlyingBlock extends GameObject {
   }
 
   update(dt: number) {
-    super.update(dt)
-    this.life -= dt
+    this.freezeTime -= dt
+    if (this.freezeTime <= 0) {
+      super.update(dt)
+      this.life -= dt
+    }
   }
 
   draw(graphics: CanvasRenderingContext2D) {
