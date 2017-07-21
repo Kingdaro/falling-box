@@ -2,6 +2,7 @@ export class GameObject {
   xvel = 0
   yvel = 0
   gravity = 0
+  color = 'white'
 
   constructor(
     public x: number,
@@ -100,7 +101,7 @@ export class GameObject {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = 'white'
+    ctx.fillStyle = this.color
     ctx.fillRect(this.x, this.y, this.width, this.height)
   }
 }

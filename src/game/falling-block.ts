@@ -15,6 +15,7 @@ export class FallingBlock extends GameObject {
   gravity = gravity
   state = FallingBlockState.falling
   life = 15
+  color = 'hsl(200, 70%, 70%)'
 
   constructor(x: number, y: number) {
     super(x, y, worldScale)

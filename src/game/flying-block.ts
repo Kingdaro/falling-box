@@ -8,6 +8,7 @@ export class FlyingBlock extends GameObject {
   life = 2
   hits = 3
   freezeTime = 0
+  color = 'lightgreen'
 
   constructor(x: number, y: number, direction: number) {
     super(x, y, worldScale)
@@ -31,12 +32,5 @@ export class FlyingBlock extends GameObject {
         this.freezeTime = 0.1
       }
     }
-  }
-
-  draw(graphics: CanvasRenderingContext2D) {
-    graphics.save()
-    graphics.fillStyle = 'green'
-    super.draw(graphics)
-    graphics.restore()
   }
 }

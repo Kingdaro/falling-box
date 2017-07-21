@@ -1,4 +1,4 @@
-import { lerpClamped } from '../util/math'
+import { lerpClamped, randomRange } from '../util/math'
 import { GameObject } from './game-object'
 import { FallingBlock } from './falling-block'
 
@@ -13,6 +13,7 @@ export class Player extends GameObject {
   movement = 0
   gravity = gravity
   holdingBlock = false
+  color = `hsl(${randomRange(0, 360)}, 70%, 70%)`
 
   constructor() {
     super(0, 0, playerSize)
@@ -67,7 +68,7 @@ export class Player extends GameObject {
 
   drawDirectionalIndicator(graphics: CanvasRenderingContext2D) {
     const { x, y } = this.grabPosition
-    graphics.fillStyle = 'white'
+    graphics.fillStyle = this.color
     graphics.beginPath()
     graphics.arc(x, y, 4, 0, Math.PI * 2)
     graphics.fill()
@@ -76,7 +77,7 @@ export class Player extends GameObject {
   drawHeldBlock(graphics: CanvasRenderingContext2D) {
     const x = this.center.x + (this.width / 2 + 40) * this.direction
     const y = this.center.y
-    graphics.fillStyle = 'white'
+    graphics.fillStyle = this.color
     graphics.fillRect(x - 35, y - 35, 70, 70)
   }
 }

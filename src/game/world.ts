@@ -2,7 +2,9 @@ import { GameObject } from './game-object'
 
 export const worldScale = 70
 
-export class WorldBlock extends GameObject {}
+export class WorldBlock extends GameObject {
+  color = 'hsl(200, 70%, 70%)'
+}
 
 export class World {
   blocks = [] as WorldBlock[]
