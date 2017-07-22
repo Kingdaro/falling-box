@@ -84,19 +84,30 @@ export class GameplayState extends GameState {
   }
 
   updatePlayer(dt: number) {
-    this.player.update(dt)
-
-    if (this.player.y > worldFalloutDepth) {
-      this.respawnPlayer()
-    }
-
-    if (this.player.checkSquish(this.fallingBlocks)) {
-      this.respawnPlayer()
+    if (this.player.dead) {
+      this.player.spawnTime -= dt
+      if (this.player.spawnTime <= 0) {
+        this.respawnPlayer()
+        this.player.dead = false
+      }
     } else {
-      const collidables = this.world.blocks.concat(
-        this.fallingBlocks.filter(block => block.isFrozen),
-      )
-      this.player.resolveGroupCollision(collidables)
+      this.player.update(dt)
+
+      const died =
+        this.player.y > worldFalloutDepth ||
+        this.player.checkSquish(this.fallingBlocks)
+
+      if (died) {
+        this.player.dead = true
+        this.player.spawnTime = 2
+      }
+
+      if (!died) {
+        const collidables = this.world.blocks.concat(
+          this.fallingBlocks.filter(block => block.isFrozen),
+        )
+        this.player.resolveGroupCollision(collidables)
+      }
     }
   }
 
