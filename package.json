@@ -19,7 +19,9 @@
     "webpack": "^3.3.0",
     "webpack-dev-server": "^2.5.1"
   },
-  "dependencies": {},
+  "dependencies": {
+    "ts-keycode-enum": "^1.0.4"
+  },
   "prettier": {
     "semi": false,
     "singleQuote": true,
