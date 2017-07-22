@@ -6,12 +6,14 @@ import { World, worldScale } from './world'
 import { Camera } from './camera'
 import { Timer } from './timer'
 import { FlyingBlock } from './flying-block'
+import { Scheduler, Task } from './scheduler'
 
 const cameraStiffness = 10
 const cameraVerticalOffset = 150
 const fallingBlockSpawnHeight = -2000
 const playerSpawnHeight = -500
 const worldFalloutDepth = 1000
+
 export class GameplayState extends GameState {
   player = new Player()
   playerInput = new PlayerInput(this.player)
@@ -19,11 +21,17 @@ export class GameplayState extends GameState {
   fallingBlocks = [] as FallingBlock[]
   flyingBlocks = [] as FlyingBlock[]
   camera = new Camera()
-  blockSpawnTimer = new Timer(0.5)
+  scheduler = new Scheduler()
 
   enter() {
     this.createWorld()
     this.respawnPlayer()
+
+    this.scheduler.addTask(
+      new Task(0.5, true, () => {
+        this.spawnFallingBlock()
+      }),
+    )
   }
 
   createWorld() {
@@ -56,10 +64,7 @@ export class GameplayState extends GameState {
     this.updateFlyingBlocks(dt)
     this.updatePlayer(dt)
     this.updateCamera(dt)
-
-    while (this.blockSpawnTimer.update(dt)) {
-      this.spawnFallingBlock()
-    }
+    this.scheduler.update(dt)
   }
 
   updateFallingBlocks(dt: number) {
