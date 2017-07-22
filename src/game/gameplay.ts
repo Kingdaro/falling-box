@@ -60,11 +60,11 @@ export class GameplayState extends GameState {
   update(dt: number) {
     if (dt > 0.5) return
 
+    this.scheduler.update(dt)
     this.updateFallingBlocks(dt)
     this.updateFlyingBlocks(dt)
     this.updatePlayer(dt)
     this.updateCamera(dt)
-    this.scheduler.update(dt)
   }
 
   updateFallingBlocks(dt: number) {
@@ -89,30 +89,28 @@ export class GameplayState extends GameState {
   }
 
   updatePlayer(dt: number) {
-    if (this.player.dead) {
-      this.player.spawnTime -= dt
-      if (this.player.spawnTime <= 0) {
-        this.respawnPlayer()
-        this.player.dead = false
-      }
-    } else {
-      this.player.update(dt)
+    if (this.player.dead) return
 
-      const died =
-        this.player.y > worldFalloutDepth ||
-        this.player.checkSquish(this.fallingBlocks)
+    this.player.update(dt)
 
-      if (died) {
-        this.player.dead = true
-        this.player.spawnTime = 2
-      }
+    const collidables = this.world.blocks.concat(
+      this.fallingBlocks.filter(block => block.isFrozen),
+    )
+    this.player.resolveGroupCollision(collidables)
 
-      if (!died) {
-        const collidables = this.world.blocks.concat(
-          this.fallingBlocks.filter(block => block.isFrozen),
-        )
-        this.player.resolveGroupCollision(collidables)
-      }
+    const died =
+      this.player.y > worldFalloutDepth ||
+      this.player.checkSquish(this.fallingBlocks)
+
+    if (died) {
+      this.player.dead = true
+
+      this.scheduler.addTask(
+        new Task(2, false, () => {
+          this.player.dead = false
+          this.respawnPlayer()
+        }),
+      )
     }
   }
 
