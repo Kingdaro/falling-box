@@ -89,7 +89,7 @@ export class GameplayState extends GameState {
   }
 
   updatePlayer(dt: number) {
-    if (this.player.dead) return
+    if (!this.player.alive) return
 
     this.player.update(dt)
 
@@ -98,16 +98,16 @@ export class GameplayState extends GameState {
     )
     this.player.resolveGroupCollision(collidables)
 
-    const died =
+    const playerDied =
       this.player.y > worldFalloutDepth ||
       this.player.checkSquish(this.fallingBlocks)
 
-    if (died) {
-      this.player.dead = true
+    if (playerDied) {
+      this.player.alive = false
 
       this.scheduler.addTask(
         new Task(2, false, () => {
-          this.player.dead = false
+          this.player.alive = true
           this.respawnPlayer()
         }),
       )

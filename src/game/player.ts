@@ -14,7 +14,7 @@ export class Player extends GameObject {
   gravity = gravity
   holdingBlock = false
   color = `hsl(${randomRange(0, 360)}, 70%, 70%)`
-  dead = false
+  alive = true
   spawnTime = 0
 
   constructor() {
@@ -60,8 +60,10 @@ export class Player extends GameObject {
   }
 
   draw(graphics: CanvasRenderingContext2D) {
-    if (this.dead) return
+    if (!this.alive) return
+
     super.draw(graphics)
+
     if (this.holdingBlock) {
       this.drawHeldBlock(graphics)
     } else {
