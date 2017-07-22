@@ -10,7 +10,8 @@
       },
       "type": "npm",
       "script": "start",
-      "problemMatcher": []
+      "problemMatcher": [],
+      "path": "d:\\Projects\\falling-box"
     }
   ]
 }
