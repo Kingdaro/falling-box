@@ -10,7 +10,7 @@ export class Scheduler {
       task.time -= dt
       if (task.time <= 0) {
         task.action()
-        task.time += task.period
+        if (task.repeat) task.time += task.period
       }
     })
     this.tasks = this.tasks.filter(task => task.time > 0 || task.repeat)
