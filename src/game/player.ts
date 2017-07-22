@@ -1,6 +1,7 @@
 import { lerpClamped, randomRange } from '../util/math'
 import { GameObject } from './game-object'
 import { FallingBlock } from './falling-block'
+import { Key } from 'ts-keycode-enum'
 
 const playerSize = 50
 const movementSpeed = 500
@@ -88,29 +89,42 @@ export class Player extends GameObject {
 }
 
 export class PlayerInput {
+  left = false
+  right = false
+  jump = false
+  grab = false
+
   constructor(private player: Player) {}
 
   keydown(event: KeyboardEvent) {
-    const { player } = this
-    if (event.key === 'ArrowLeft') {
-      player.direction = -1
-      player.movement = 1
-    }
-    if (event.key === 'ArrowRight') {
-      player.direction = 1
-      player.movement = 1
-    }
-    if (event.key === 'ArrowUp') {
-      player.jump()
-    }
+    if (event.keyCode === Key.LeftArrow) this.left = true
+    if (event.keyCode === Key.RightArrow) this.right = true
+    if (event.keyCode === Key.UpArrow) this.jump = true
+    if (event.keyCode === Key.Z) this.grab = true
   }
 
   keyup(event: KeyboardEvent) {
-    if (event.key === 'ArrowLeft' && this.player.direction < 0) {
+    if (event.keyCode === Key.LeftArrow) this.left = false
+    if (event.keyCode === Key.RightArrow) this.right = false
+    if (event.keyCode === Key.UpArrow) this.jump = false
+    if (event.keyCode === Key.Z) this.grab = false
+  }
+
+  update() {
+    if ((!this.left && !this.right) || (this.left && this.right)) {
       this.player.movement = 0
     }
-    if (event.key === 'ArrowRight' && this.player.direction > 0) {
-      this.player.movement = 0
+    if (this.left && !this.right) {
+      this.player.movement = 1
+      this.player.direction = -1
+    }
+    if (this.right && !this.left) {
+      this.player.movement = 1
+      this.player.direction = 1
+    }
+
+    if (this.jump) {
+      this.player.jump()
     }
   }
 }

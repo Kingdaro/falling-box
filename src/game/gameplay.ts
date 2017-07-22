@@ -63,6 +63,7 @@ export class GameplayState extends GameState {
     this.scheduler.update(dt)
     this.updateFallingBlocks(dt)
     this.updateFlyingBlocks(dt)
+    this.playerInput.update()
     this.updatePlayer(dt)
     this.updateCamera(dt)
   }
@@ -92,6 +93,12 @@ export class GameplayState extends GameState {
     if (!this.player.alive) return
 
     this.player.update(dt)
+
+    if (this.playerInput.grab) {
+      this.handleBlockGrab(this.player)
+    } else {
+      this.handleBlockRelease(this.player)
+    }
 
     const collidables = this.world.blocks.concat(
       this.fallingBlocks.filter(block => block.isFrozen),
@@ -141,18 +148,10 @@ export class GameplayState extends GameState {
 
   keydown(event: KeyboardEvent) {
     this.playerInput.keydown(event)
-
-    if (event.key === 'z') {
-      this.handleBlockGrab(this.player)
-    }
   }
 
   keyup(event: KeyboardEvent) {
     this.playerInput.keyup(event)
-
-    if (event.key === 'z') {
-      this.handleBlockRelease(this.player)
-    }
   }
 
   draw(ctx: CanvasRenderingContext2D) {
