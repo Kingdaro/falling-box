@@ -37,26 +37,19 @@ class Player implements GameEventHandler {
 }
 
 class PlayerInput implements GameEventHandler {
-  final movementKeyboardInput =
-      CombinedAxisInput(KeyInput(KeyCode.LEFT), KeyInput(KeyCode.RIGHT));
-
-  final movementJoystickInput = JoystickAxisInput();
+  final _movementControl = Control([
+    JoystickAxisInput(),
+    CombinedAxisInput(KeyInput(KeyCode.LEFT), KeyInput(KeyCode.RIGHT)),
+  ]);
 
   num currentMovement = 0;
 
   @override
   void handleGameEvent(GameEvent event) {
-    final movementInputs = [movementJoystickInput, movementKeyboardInput];
-
-    movementInputs.forEach((input) => input.handleGameEvent(event));
-
-    final activeInput = movementInputs.firstWhere((input) => input.isActive,
-        orElse: () => EmptyInput());
-
-    final targetMovement = activeInput?.value ?? 0;
+    _movementControl.handleGameEvent(event);
 
     if (event is UpdateEvent) {
-      currentMovement = lerp(currentMovement, targetMovement,
+      currentMovement = lerp(currentMovement, _movementControl.value,
           event.delta * playerMovementStiffness);
     }
   }
