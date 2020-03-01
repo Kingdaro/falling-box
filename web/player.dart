@@ -12,36 +12,6 @@ class Player implements GameEventHandler {
   static const size = 50;
   static const gravity = 2500;
   static const jumpSpeed = 800;
-
-  var position = vec(50, 50);
-  num fallingVelocity = 0;
-  final _input = PlayerInput();
-
-  @override
-  void handleGameEvent(GameEvent event) {
-    _input.handleGameEvent(event);
-
-    if (event is UpdateEvent) {
-      final movementDelta = _input.currentMovement * speed * event.delta;
-
-      if (_input.isJumping) {
-        fallingVelocity = -jumpSpeed;
-      } else {
-        fallingVelocity += gravity * event.delta;
-      }
-
-      position += vec(movementDelta, fallingVelocity * event.delta);
-    }
-
-    if (event is DrawEvent) {
-      event.context2d
-        ..fillStyle = 'white'
-        ..fillRect(position.x, position.y, size, size);
-    }
-  }
-}
-
-class PlayerInput implements GameEventHandler {
   static const movementStiffness = 10;
 
   final _movementControl = Control([
@@ -53,10 +23,12 @@ class PlayerInput implements GameEventHandler {
     CombinedAxisInput(KeyInput(KeyCode.LEFT), KeyInput(KeyCode.RIGHT)),
   ]);
 
-  num currentMovement = 0;
-
   final _jumpControl = Control(
       [JoystickButtonInput(0), JoystickButtonInput(1), KeyInput(KeyCode.Z)]);
+
+  var position = vec(50, 50);
+  num fallingVelocity = 0;
+  num currentMovement = 0;
 
   var _jumpState = JumpState.falling;
   bool get isJumping => _jumpState == JumpState.jumping;
@@ -72,6 +44,22 @@ class PlayerInput implements GameEventHandler {
 
       _jumpState =
           _jumpControl.isActive ? JumpState.jumping : JumpState.falling;
+
+      final movementDelta = currentMovement * speed * event.delta;
+
+      if (isJumping) {
+        fallingVelocity = -jumpSpeed;
+      } else {
+        fallingVelocity += gravity * event.delta;
+      }
+
+      position += vec(movementDelta, fallingVelocity * event.delta);
+    }
+
+    if (event is DrawEvent) {
+      event.context2d
+        ..fillStyle = 'white'
+        ..fillRect(position.x, position.y, size, size);
     }
   }
 }
