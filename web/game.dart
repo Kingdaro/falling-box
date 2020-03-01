@@ -7,21 +7,10 @@ class GameState {
 }
 
 class Game implements GameEventHandler {
-  final _state = GameState();
-  final _playerInput = PlayerInput();
+  final _player = Player();
 
   @override
   void handleGameEvent(GameEvent event) {
-    _playerInput.handleGameEvent(event);
-
-    if (event is UpdateEvent) {
-      _state.playerX += _playerInput.currentMovement * 500 * event.delta;
-    }
-
-    if (event is DrawEvent) {
-      event.context2d
-        ..fillStyle = 'white'
-        ..fillRect(_state.playerX, _state.playerY, 50, 50);
-    }
+    _player.handleGameEvent(event);
   }
 }
