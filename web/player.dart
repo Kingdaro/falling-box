@@ -6,7 +6,7 @@ import 'vector.dart';
 const playerSpeed = 500;
 const playerSize = 50;
 const playerMovementStiffness = 10;
-const playerGravity = 800;
+const playerGravity = 1200;
 
 class Player implements GameEventHandler {
   var position = vec(50, 50);
