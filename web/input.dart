@@ -68,6 +68,27 @@ class KeyInput implements Input, GameEventHandler {
   }
 }
 
+/// Tracks joystick buttons, 0 or 1.
+/// Currently only tracks the first gamepad
+class JoystickButtonInput implements Input {
+  final int _buttonIndex;
+
+  JoystickButtonInput(this._buttonIndex);
+
+  @override
+  num get value =>
+      window.navigator
+          .getGamepads()
+          .first
+          ?.buttons
+          ?.elementAt(_buttonIndex)
+          ?.value ??
+      0;
+
+  @override
+  void handleGameEvent(GameEvent event) {}
+}
+
 /// Tracks joystick axes, -1 to 1.
 /// Currently only tracks the first axis on the first gamepad
 class JoystickAxisInput implements Input {
