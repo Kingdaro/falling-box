@@ -110,11 +110,12 @@ class JoystickAxisInput implements Input {
 ///
 /// Put higher priority inputs higher in the list (e.g. if you want joystick to have
 /// higher priority than keyboard, put joystick before keyboard in the list)
-class Control implements GameEventHandler {
+class Control implements Input {
   final List<Input> _inputs;
 
   Control(this._inputs);
 
+  @override
   num get value {
     final activeInput = _inputs.firstWhere((input) => input.isActive,
         orElse: () => EmptyInput());
