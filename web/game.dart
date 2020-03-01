@@ -1,8 +1,5 @@
-import 'dart:html';
-
 import 'game_event.dart';
-import 'input.dart';
-import 'math.dart';
+import 'player.dart';
 
 class GameState {
   num playerX = 0;
@@ -25,27 +22,6 @@ class Game implements GameEventHandler {
       event.context2d
         ..fillStyle = 'white'
         ..fillRect(_state.playerX, _state.playerY, 50, 50);
-    }
-  }
-}
-
-class PlayerInput implements GameEventHandler {
-  final _left = KeyInput(KeyCode.LEFT);
-  final _right = KeyInput(KeyCode.RIGHT);
-
-  int get _targetMovement =>
-      (_left.isPressed ? -1 : 0) + (_right.isPressed ? 1 : 0);
-
-  num currentMovement = 0;
-
-  @override
-  void handleGameEvent(GameEvent event) {
-    _left.handleGameEvent(event);
-    _right.handleGameEvent(event);
-
-    if (event is UpdateEvent) {
-      currentMovement =
-          lerp(currentMovement, _targetMovement, event.delta * 10);
     }
   }
 }
