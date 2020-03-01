@@ -1,14 +1,14 @@
 import 'game_event.dart';
 import 'input.dart';
 import 'math.dart';
+import 'vector.dart';
 
 const playerSpeed = 500;
 const playerSize = 50;
 const playerMovementStiffness = 10;
 
 class Player implements GameEventHandler {
-  num _x = 0;
-  num _y = 0;
+  var position = vec(50, 50);
   final PlayerInput _input;
 
   Player(this._input);
@@ -18,13 +18,13 @@ class Player implements GameEventHandler {
     _input.handleGameEvent(event);
 
     if (event is UpdateEvent) {
-      _x += _input.currentMovement * playerSpeed * event.delta;
+      position += vec(_input.currentMovement * playerSpeed * event.delta, 0);
     }
 
     if (event is DrawEvent) {
       event.context2d
         ..fillStyle = 'white'
-        ..fillRect(_x, _y, playerSize, playerSize);
+        ..fillRect(position.x, position.y, playerSize, playerSize);
     }
   }
 }
