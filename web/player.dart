@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'game_event.dart';
 import 'input.dart';
 import 'math.dart';
@@ -11,7 +9,9 @@ const playerMovementStiffness = 10;
 class Player implements GameEventHandler {
   num x = 0;
   num y = 0;
-  final _input = PlayerInput();
+  final PlayerInput _input;
+
+  Player(this._input);
 
   @override
   void handleGameEvent(GameEvent event) {
@@ -30,21 +30,18 @@ class Player implements GameEventHandler {
 }
 
 class PlayerInput implements GameEventHandler {
-  final _left = KeyInput(KeyCode.LEFT);
-  final _right = KeyInput(KeyCode.RIGHT);
-
-  int get _targetMovement =>
-      (_left.isPressed ? -1 : 0) + (_right.isPressed ? 1 : 0);
+  final Input _axisInput;
 
   num currentMovement = 0;
 
+  PlayerInput(this._axisInput);
+
   @override
   void handleGameEvent(GameEvent event) {
-    _left.handleGameEvent(event);
-    _right.handleGameEvent(event);
+    _axisInput.handleGameEvent(event);
 
     if (event is UpdateEvent) {
-      currentMovement = lerp(currentMovement, _targetMovement,
+      currentMovement = lerp(currentMovement, _axisInput.value,
           event.delta * playerMovementStiffness);
     }
   }
