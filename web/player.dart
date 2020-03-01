@@ -7,8 +7,8 @@ const playerSize = 50;
 const playerMovementStiffness = 10;
 
 class Player implements GameEventHandler {
-  num x = 0;
-  num y = 0;
+  num _x = 0;
+  num _y = 0;
   final PlayerInput _input;
 
   Player(this._input);
@@ -18,13 +18,13 @@ class Player implements GameEventHandler {
     _input.handleGameEvent(event);
 
     if (event is UpdateEvent) {
-      x += _input.currentMovement * playerSpeed * event.delta;
+      _x += _input.currentMovement * playerSpeed * event.delta;
     }
 
     if (event is DrawEvent) {
       event.context2d
         ..fillStyle = 'white'
-        ..fillRect(x, y, playerSize, playerSize);
+        ..fillRect(_x, _y, playerSize, playerSize);
     }
   }
 }
