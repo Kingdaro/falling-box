@@ -29,10 +29,12 @@ Future main() async {
   num lastFrameTime = 0;
   while (true) {
     final currentFrameTime = await window.animationFrame;
-    final delta = currentFrameTime - lastFrameTime;
+    final deltaSeconds = (currentFrameTime - lastFrameTime) / 1000;
     lastFrameTime = currentFrameTime;
 
-    game.handleGameEvent(UpdateEvent(delta / 1000));
+    if (deltaSeconds > 0.5) continue;
+
+    game.handleGameEvent(UpdateEvent(deltaSeconds));
 
     canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
     game.handleGameEvent(DrawEvent(canvas.context2D));
