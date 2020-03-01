@@ -6,6 +6,14 @@ abstract class Input implements GameEventHandler {
   num get value;
 }
 
+class EmptyInput implements Input {
+  @override
+  num get value => 0;
+
+  @override
+  void handleGameEvent(GameEvent event) {}
+}
+
 class CombinedAxisInput implements Input {
   final Input _left;
   final Input _right;
@@ -41,15 +49,19 @@ class KeyInput implements Input, GameEventHandler {
   }
 }
 
-const joystickAxisDeadzone = 0.3;
-
 class JoystickAxisInput implements Input {
+  static const deadzone = 0.3;
+
   @override
   num get value {
     var axisValue = window.navigator.getGamepads().first?.axes?.first ?? 0;
-    return axisValue.abs() > joystickAxisDeadzone ? axisValue : 0;
+    return axisValue.abs() > deadzone ? axisValue : 0;
   }
 
   @override
   void handleGameEvent(GameEvent event) {}
+}
+
+extension InputExtension on Input {
+  bool get isActive => value != 0;
 }

@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'game_event.dart';
 import 'input.dart';
 import 'math.dart';
@@ -11,9 +13,7 @@ const playerGravity = 1200;
 class Player implements GameEventHandler {
   var position = vec(50, 50);
   num fallingVelocity = 0;
-  final PlayerInput _input;
-
-  Player(this._input);
+  final _input = PlayerInput();
 
   @override
   void handleGameEvent(GameEvent event) {
@@ -37,18 +37,26 @@ class Player implements GameEventHandler {
 }
 
 class PlayerInput implements GameEventHandler {
-  final Input _axisInput;
+  final movementKeyboardInput =
+      CombinedAxisInput(KeyInput(KeyCode.LEFT), KeyInput(KeyCode.RIGHT));
+
+  final movementJoystickInput = JoystickAxisInput();
 
   num currentMovement = 0;
 
-  PlayerInput(this._axisInput);
-
   @override
   void handleGameEvent(GameEvent event) {
-    _axisInput.handleGameEvent(event);
+    final movementInputs = [movementJoystickInput, movementKeyboardInput];
+
+    movementInputs.forEach((input) => input.handleGameEvent(event));
+
+    final activeInput = movementInputs.firstWhere((input) => input.isActive,
+        orElse: () => EmptyInput());
+
+    final targetMovement = activeInput?.value ?? 0;
 
     if (event is UpdateEvent) {
-      currentMovement = lerp(currentMovement, _axisInput.value,
+      currentMovement = lerp(currentMovement, targetMovement,
           event.delta * playerMovementStiffness);
     }
   }
