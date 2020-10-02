@@ -1,0 +1,18 @@
+{
+  "name": "falling-box",
+  "private": true,
+  "scripts": {
+    "dev": "poi --serve --port 8080",
+    "build": "poi --prod",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@egoist/snackbar": "^1.2.2",
+    "@poi/plugin-pwa": "^12.0.2",
+    "@poi/plugin-typescript": "^12.0.1",
+    "poi": "^12.4.2",
+    "prettier": "^2.1.2",
+    "typescript": "^3.2.1",
+    "workbox-window": "^4.3.1"
+  }
+}
