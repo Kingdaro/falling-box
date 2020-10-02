@@ -964,7 +964,7 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@egoist/snackbar@^1.2.2":
+"@egoist/snackbar@^1.5.1":
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/@egoist/snackbar/-/snackbar-1.5.1.tgz#cc25118c01d4e92c63d108c29bc06c7d601877e8"
   integrity sha512-hIbfxDw54noQhguFkCpyHTO2hZ7mDmovN/1rrMzGmtNEucEq0AMr5PBh5JukBl4wcDa8FVs6lILOMLgp0WHUZQ==
@@ -1019,7 +1019,7 @@
     lodash "^4.17.11"
     posthtml "^0.13.0"
 
-"@poi/plugin-pwa@^12.0.2":
+"@poi/plugin-pwa@^12.0.3":
   version "12.0.3"
   resolved "https://registry.yarnpkg.com/@poi/plugin-pwa/-/plugin-pwa-12.0.3.tgz#70b61615d3b9c1227545f01678cd770e3b556e9a"
   integrity sha512-h/9FQYJsKty6LWkRRmkgUBEo/vQt68bL4b0jZwnPeHmhaUIYJ/pi9XtR4nxqmjYWhpG2EuibIYigATkZVbuJ5Q==
@@ -1028,7 +1028,7 @@
     pwa-html-webpack-plugin "^12.0.0"
     workbox-webpack-plugin "^3.6.3"
 
-"@poi/plugin-typescript@^12.0.1":
+"@poi/plugin-typescript@^12.3.1":
   version "12.3.1"
   resolved "https://registry.yarnpkg.com/@poi/plugin-typescript/-/plugin-typescript-12.3.1.tgz#50ae8119f554361bcedcb30f9e3f859f6ebb173f"
   integrity sha512-iniaGBHYsqWJH2sGM6+YJQma3BdsapyvY4NQSPoIZQRn8TLNTcT1w9g4KLNDb/ZSRnf+jnI3SrOjcbvxJXLRBw==
@@ -5386,7 +5386,7 @@ pkg-up@^3.1.0:
   dependencies:
     find-up "^3.0.0"
 
-poi@^12.4.2:
+poi@^12.10.2:
   version "12.10.2"
   resolved "https://registry.yarnpkg.com/poi/-/poi-12.10.2.tgz#7cdc0f80596bf24bd6a9fc866bc811b68a683726"
   integrity sha512-iTr5hTVC/Lvm/69l51dY6vW8sTBq84b5FjR8ToOjGIcZPXL8nnFF4y0/416Kp3ogsqZXOSZb3a1KFvPfbVroVQ==
@@ -7054,10 +7054,10 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@^3.2.1:
-  version "3.9.7"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.7.tgz#98d600a5ebdc38f40cb277522f12dc800e9e25fa"
-  integrity sha512-BLbiRkiBzAwsjut4x/dsibSTB6yWpwT5qWmC2OfuCg3GgVQCSgMs4vEctYPhsaGtd0AeuuHMkjZ2h2WG8MSzRw==
+typescript@^4.1.0-beta:
+  version "4.1.0-beta"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.1.0-beta.tgz#e4d054035d253b7a37bdc077dd71706508573e69"
+  integrity sha512-b/LAttdVl3G6FEmnMkDsK0xvfvaftXpSKrjXn+OVCRqrwz5WD/6QJOiN+dTorqDY+hkaH+r2gP5wI1jBDmdQ7A==
 
 unicode-canonical-property-names-ecmascript@^1.0.4:
   version "1.0.4"
@@ -7572,10 +7572,10 @@ workbox-core@^3.6.3:
   resolved "https://registry.yarnpkg.com/workbox-core/-/workbox-core-3.6.3.tgz#69abba70a4f3f2a5c059295a6f3b7c62bd00e15c"
   integrity sha512-cx9cx0nscPkIWs8Pt98HGrS9/aORuUcSkWjG25GqNWdvD/pSe7/5Oh3BKs0fC+rUshCiyLbxW54q0hA+GqZeSQ==
 
-workbox-core@^4.3.1:
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/workbox-core/-/workbox-core-4.3.1.tgz#005d2c6a06a171437afd6ca2904a5727ecd73be6"
-  integrity sha512-I3C9jlLmMKPxAC1t0ExCq+QoAMd0vAAHULEgRZ7kieCdUd919n53WC0AfvokHNwqRhGn+tIIj7vcb5duCjs2Kg==
+workbox-core@^5.1.4:
+  version "5.1.4"
+  resolved "https://registry.yarnpkg.com/workbox-core/-/workbox-core-5.1.4.tgz#8bbfb2362ecdff30e25d123c82c79ac65d9264f4"
+  integrity sha512-+4iRQan/1D8I81nR2L5vcbaaFskZC2CL17TLbvWVzQ4qiF/ytOGF6XeV54pVxAvKUtkLANhk8TyIUMtiMw2oDg==
 
 workbox-google-analytics@^3.6.3:
   version "3.6.3"
@@ -7643,12 +7643,12 @@ workbox-webpack-plugin@^3.6.3:
     json-stable-stringify "^1.0.1"
     workbox-build "^3.6.3"
 
-workbox-window@^4.3.1:
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/workbox-window/-/workbox-window-4.3.1.tgz#ee6051bf10f06afa5483c9b8dfa0531994ede0f3"
-  integrity sha512-C5gWKh6I58w3GeSc0wp2Ne+rqVw8qwcmZnQGpjiek8A2wpbxSJb1FdCoQVO+jDJs35bFgo/WETgl1fqgsxN0Hg==
+workbox-window@^5.1.4:
+  version "5.1.4"
+  resolved "https://registry.yarnpkg.com/workbox-window/-/workbox-window-5.1.4.tgz#2740f7dea7f93b99326179a62f1cc0ca2c93c863"
+  integrity sha512-vXQtgTeMCUq/4pBWMfQX8Ee7N2wVC4Q7XYFqLnfbXJ2hqew/cU1uMTD2KqGEgEpE4/30luxIxgE+LkIa8glBYw==
   dependencies:
-    workbox-core "^4.3.1"
+    workbox-core "^5.1.4"
 
 worker-farm@^1.7.0:
   version "1.7.0"
