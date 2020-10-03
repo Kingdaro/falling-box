@@ -1,33 +1,31 @@
 import { Camera } from "./camera"
+import { Collider } from "./collision"
 import { canvas, context } from "./graphics"
+import { MapBlock, mapBlockSize } from "./map-block"
 import { Player } from "./player"
-import { Rect } from "./rect"
-
-const mapScale = 50
 
 const cameraStiffness = 8
-
-function mapBlock(left: number, top: number, width: number, height: number) {
-  return new Rect(
-    left * mapScale,
-    top * mapScale,
-    width * mapScale,
-    height * mapScale,
-  )
-}
 
 export class Game {
   player = new Player()
   camera = new Camera()
+  collider = new Collider(mapBlockSize)
 
-  mapBlocks: Rect[] = [
-    mapBlock(0, 0, 30, 1),
-    mapBlock(1, 1, 28, 1),
-    mapBlock(2, 2, 26, 1),
+  mapBlocks = [
+    new MapBlock(0, 0, 30, 1),
+    new MapBlock(1, 1, 28, 1),
+    new MapBlock(2, 2, 26, 1),
   ]
 
+  constructor() {
+    this.collider.add(this.player, ...this.player.rect.values)
+    for (const block of this.mapBlocks) {
+      this.collider.add(block, ...block.rect.values)
+    }
+  }
+
   update(dt: number) {
-    this.player.update(dt)
+    this.player.update(dt, this.collider)
     this.camera.moveTowards(...this.player.rect.center, dt * cameraStiffness)
   }
 
@@ -36,10 +34,8 @@ export class Game {
 
     this.camera.apply(() => {
       for (const block of this.mapBlocks) {
-        context.fillStyle = "white"
-        context.fillRect(...block.values)
+        block.draw()
       }
-
       this.player.draw()
     })
   }
