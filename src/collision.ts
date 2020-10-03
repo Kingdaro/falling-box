@@ -40,4 +40,12 @@ export class Collider {
       body.destroy()
     }
   }
+
+  setPosition(obj: object, left: number, top: number) {
+    const body = this.bodiesByObject.get(obj)
+    if (body) {
+      this.remove(obj)
+      this.add(obj, left, top, body.w, body.h)
+    }
+  }
 }

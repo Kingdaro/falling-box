@@ -8,6 +8,10 @@ declare module "bopit" {
 
   export class Body {
     constructor(left: number, top: number, width: number, height: number)
+    x: number
+    y: number
+    w: number
+    h: number
     add(world: World): void
     destroy(): void
     move(left: number, top: number, filter?: MoveFilter): MoveResult
