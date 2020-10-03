@@ -1,11 +1,12 @@
 import { Collider } from "./collision"
 import { context } from "./graphics"
-import { isAnyDown } from "./keyboard"
+import { isDown, wasPressed } from "./keyboard"
 import { MapBlock } from "./map-block"
 import { Rect } from "./rect"
 
-const playerSpeed = 500
-const playerGravity = 800
+const speed = 500
+const gravity = 2500
+const jumpSpeed = 800
 
 export class Player {
   rect = new Rect(0, -300, 40)
@@ -14,11 +15,15 @@ export class Player {
 
   update(dt: number, collider: Collider) {
     let xvel = 0
-    if (isAnyDown("ArrowLeft", "KeyA")) xvel -= playerSpeed
-    if (isAnyDown("ArrowRight", "KeyR")) xvel += playerSpeed
-
+    if (["ArrowLeft", "KeyA"].some(isDown)) xvel -= speed
+    if (["ArrowRight", "KeyR"].some(isDown)) xvel += speed
     this.xvel = xvel
-    this.yvel += playerGravity * dt
+
+    if (wasPressed("ArrowUp")) {
+      this.yvel = -jumpSpeed
+    } else {
+      this.yvel += gravity * dt
+    }
 
     const [finalX, finalY, collisions] = collider.move(
       this,
