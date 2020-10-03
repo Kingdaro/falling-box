@@ -5,7 +5,7 @@ import { Rect } from "./rect"
 const playerSpeed = 500
 
 export class Player {
-  rect = new Rect(0, -100, 40)
+  rect = new Rect(0, -300, 40)
 
   update(dt: number) {
     if (isAnyDown("ArrowLeft", "KeyA")) {
@@ -18,6 +18,6 @@ export class Player {
 
   draw() {
     context.fillStyle = "white"
-    context.fillRect(...this.rect.components)
+    context.fillRect(...this.rect.values)
   }
 }

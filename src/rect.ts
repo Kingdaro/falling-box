@@ -14,7 +14,11 @@ export class Rect {
     return this.top + this.height
   }
 
-  get components() {
+  get center() {
+    return [this.left + this.width / 2, this.top + this.height / 2] as const
+  }
+
+  get values() {
     return [this.left, this.top, this.width, this.height] as const
   }
 }
