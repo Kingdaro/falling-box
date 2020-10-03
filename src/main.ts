@@ -1,5 +1,6 @@
 import { Game } from "./game"
 import { canvas, initGraphics } from "./graphics"
+import { updateKeyboard } from "./keyboard"
 import "./styles.css"
 
 function animationFrame() {
@@ -19,6 +20,8 @@ async function main() {
     const frameTime = await animationFrame()
     const elapsed = frameTime - currentTime
     currentTime = frameTime
+
+    updateKeyboard()
 
     game.update(elapsed / 1000)
     game.draw()

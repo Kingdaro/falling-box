@@ -1,12 +1,44 @@
-const keys = new Set<string>()
+type KeyState = "justPressed" | "pressed" | "justReleased" | "released"
+const keyStates = new Map<string, KeyState>()
+const eventQueue: KeyboardEvent[] = []
 
 window.addEventListener("keydown", (event) => {
-  keys.add(event.key)
-})
-window.addEventListener("keyup", (event) => {
-  keys.delete(event.key)
+  if (!event.repeat) eventQueue.push(event)
 })
 
-export function isAnyDown(...args: string[]) {
-  return args.some((key) => keys.has(key))
+window.addEventListener("keyup", (event) => {
+  if (!event.repeat) eventQueue.push(event)
+})
+
+// release all keys when unfocused to avoid bad/inconsistent key states
+window.addEventListener("blur", () => keyStates.clear())
+
+export function updateKeyboard() {
+  for (const [key, state] of keyStates) {
+    if (state === "justPressed") {
+      keyStates.set(key, "pressed")
+    }
+    if (state === "justReleased") {
+      keyStates.set(key, "released")
+    }
+  }
+
+  let event
+  while ((event = eventQueue.pop())) {
+    if (event.type === "keydown") {
+      keyStates.set(event.key, "justPressed")
+    }
+    if (event.type === "keyup") {
+      keyStates.set(event.key, "justReleased")
+    }
+  }
+}
+
+export function isDown(key: string) {
+  const state = keyStates.get(key)
+  return state === "pressed" || state === "justPressed"
+}
+
+export function wasPressed(key: string) {
+  return keyStates.get(key) === "justPressed"
 }
