@@ -36,8 +36,8 @@ export class Player {
     this.rect.setTopLeft(finalX, finalY)
 
     for (const col of collisions) {
-      if (col.normal.x != 0) this.xvel = 0
-      if (col.normal.y != 0) this.yvel = 0
+      if (col.normal.x !== 0) this.xvel = 0
+      if (col.normal.y !== 0) this.yvel = 0
     }
   }
 
