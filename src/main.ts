@@ -9,8 +9,8 @@ function animationFrame() {
 async function main() {
   initGraphics()
 
-  const app = document.getElementById("app")
-  app?.append(canvas)
+  const app = document.getElementById("app")!
+  app.append(canvas)
 
   const game = new Game()
 
