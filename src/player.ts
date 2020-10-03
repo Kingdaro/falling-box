@@ -1,24 +1,23 @@
 import { context } from "./graphics"
 import { isAnyDown } from "./keyboard"
+import { Rect } from "./rect"
 
 const playerSpeed = 500
 
 export class Player {
-  x = 100
-  y = 100
-  size = 40
+  rect = new Rect(100, 100, 40)
 
   update(dt: number) {
     if (isAnyDown("ArrowLeft", "KeyA")) {
-      this.x -= playerSpeed * dt
+      this.rect.left -= playerSpeed * dt
     }
     if (isAnyDown("ArrowRight", "KeyR")) {
-      this.x += playerSpeed * dt
+      this.rect.left += playerSpeed * dt
     }
   }
 
   draw() {
     context.fillStyle = "white"
-    context.fillRect(this.x, this.y, this.size, this.size)
+    context.fillRect(...this.rect.components)
   }
 }
