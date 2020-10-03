@@ -2,20 +2,42 @@ import { Collider } from "./collision"
 import { context } from "./graphics"
 import { isDown, wasPressed } from "./keyboard"
 import { MapBlock } from "./map-block"
+import { randomRange } from "./math"
 import { Rect } from "./rect"
+import { WorldMap } from "./world-map"
 
 const speed = 500
 const gravity = 2500
 const jumpSpeed = 800
 const maxJumps = 2
+const falloutDepth = 1000
+const respawnHeight = 500
 
 export class Player {
-  rect = new Rect(0, -300, 40)
+  rect = new Rect(0, 0, 40)
   jumps = maxJumps
   xvel = 0
   yvel = 0
 
-  update(dt: number, collider: Collider) {
+  constructor(collider: Collider, map: WorldMap) {
+    collider.add(this, ...this.rect.values)
+    this.respawn(collider, map)
+  }
+
+  respawn(collider: Collider, map: WorldMap) {
+    this.rect.top = -respawnHeight
+    this.rect.left = randomRange(map.left, map.right)
+    this.xvel = 0
+    this.yvel = 0
+    collider.setPosition(this, this.rect.left, this.rect.top)
+  }
+
+  update(dt: number, collider: Collider, map: WorldMap) {
+    if (this.rect.top >= falloutDepth) {
+      this.respawn(collider, map)
+      return
+    }
+
     let xvel = 0
     if (["ArrowLeft", "KeyA"].some(isDown)) xvel -= speed
     if (["ArrowRight", "KeyR"].some(isDown)) xvel += speed
