@@ -21,4 +21,14 @@ export class Rect {
   get values() {
     return [this.left, this.top, this.width, this.height] as const
   }
+
+  setTopLeft(left: number, top: number) {
+    this.left = left
+    this.top = top
+  }
+
+  move(leftDelta: number, topDelta: number) {
+    this.left += leftDelta
+    this.top += topDelta
+  }
 }
