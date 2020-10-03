@@ -35,9 +35,10 @@ export class Player {
     )
     this.rect.setTopLeft(finalX, finalY)
 
+    // prettier-ignore
     for (const col of collisions) {
-      if (col.normal.x !== 0) this.xvel = 0
-      if (col.normal.y !== 0) this.yvel = 0
+      if (col.normal.x !== 0 && Math.sign(col.normal.x) !== Math.sign(this.xvel)) this.xvel = 0
+      if (col.normal.y !== 0 && Math.sign(col.normal.y) !== Math.sign(this.yvel)) this.yvel = 0
     }
   }
 
