@@ -5,7 +5,7 @@ import { Rect } from "./rect"
 const playerSpeed = 500
 
 export class Player {
-  rect = new Rect(100, 100, 40)
+  rect = new Rect(0, -100, 40)
 
   update(dt: number) {
     if (isAnyDown("ArrowLeft", "KeyA")) {
