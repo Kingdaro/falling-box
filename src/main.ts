@@ -1,4 +1,5 @@
 import { Game } from "./game"
+import { updateGamepad } from "./gamepad"
 import { canvas, initGraphics } from "./graphics"
 import { updateKeyboard } from "./keyboard"
 import "./styles.css"
@@ -22,6 +23,7 @@ async function main() {
     currentTime = frameTime
 
     updateKeyboard()
+    updateGamepad()
 
     game.update(elapsed / 1000)
     game.draw()

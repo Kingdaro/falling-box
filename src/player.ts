@@ -1,4 +1,5 @@
 import { Collider } from "./collision"
+import { getAxis, isButtonDown, wasButtonPressed } from "./gamepad"
 import { context } from "./graphics"
 import { isDown, wasPressed } from "./keyboard"
 import { MapBlock } from "./map-block"
@@ -38,14 +39,10 @@ export class Player {
       return
     }
 
-    let xvel = 0
-    if (["ArrowLeft", "KeyA"].some(isDown)) xvel -= speed
-    if (["ArrowRight", "KeyR"].some(isDown)) xvel += speed
-
-    this.xvel = xvel
+    this.xvel = movementValue() * speed
     this.yvel += gravity * dt
 
-    if (wasPressed("ArrowUp") && this.jumps > 0) {
+    if (hasJumped() && this.jumps > 0) {
       this.yvel = -jumpSpeed
       this.jumps -= 1
     }
@@ -80,3 +77,19 @@ export class Player {
     context.fillRect(...this.rect.valuesRounded)
   }
 }
+
+const movementValue = () => {
+  const axis = getAxis("leftX")
+  if (axis !== 0) return axis
+
+  let value = 0
+  if (isButtonDown("dpadLeft") || ["ArrowLeft", "KeyA"].some(isDown)) {
+    value -= 1
+  }
+  if (isButtonDown("dpadRight") || ["ArrowRight", "KeyR"].some(isDown)) {
+    value += 1
+  }
+  return value
+}
+
+const hasJumped = () => wasButtonPressed("a") || wasPressed("ArrowUp")
