@@ -6,6 +6,7 @@ import { canvas, context } from "./graphics"
 import { mapBlockSize } from "./map-block"
 import { randomRange } from "./math"
 import { Player } from "./player"
+import { StaticBlock } from "./static-block"
 import { WorldMap } from "./world-map"
 
 const cameraStiffness = 8
@@ -17,12 +18,13 @@ export class Game {
   player = new Player(this.collider, this.map)
   camera = new Camera()
 
-  fallingBlocks: FallingBlock[] = []
+  fallingBlocks = new Set<FallingBlock>()
+  staticBlocks = new Set<StaticBlock>()
   blockSpawnClock = new Clock(0.5)
 
   update(dt: number) {
     while (this.blockSpawnClock.advance(dt)) {
-      this.fallingBlocks.push(
+      this.fallingBlocks.add(
         new FallingBlock(
           this.collider,
           Math.floor(
@@ -35,6 +37,18 @@ export class Game {
 
     for (const block of this.fallingBlocks) {
       block.update(dt, this.collider)
+      if (block.shouldBecomeStatic) {
+        this.fallingBlocks.delete(block)
+        this.collider.remove(block)
+
+        this.staticBlocks.add(
+          new StaticBlock(
+            this.collider,
+            block.rect.left,
+            Math.round(block.rect.top / mapBlockSize) * mapBlockSize,
+          ),
+        )
+      }
     }
 
     this.player.update(dt, this.collider, this.map)
@@ -47,6 +61,7 @@ export class Game {
     this.camera.apply(() => {
       this.map.draw()
       this.fallingBlocks.forEach((b) => b.draw())
+      this.staticBlocks.forEach((b) => b.draw())
       this.player.draw()
     })
   }

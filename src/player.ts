@@ -1,11 +1,11 @@
 import { Collider } from "./collision"
-import { FallingBlock } from "./falling-block"
 import { getAxis, isButtonDown, wasButtonPressed } from "./gamepad"
 import { context } from "./graphics"
 import { isDown, wasPressed } from "./keyboard"
 import { MapBlock } from "./map-block"
 import { randomRange } from "./math"
 import { Rect } from "./rect"
+import { StaticBlock } from "./static-block"
 import { WorldMap } from "./world-map"
 
 const speed = 500
@@ -53,7 +53,7 @@ export class Player {
       this.rect.left + this.xvel * dt,
       this.rect.top + this.yvel * dt,
       (other) => {
-        if (other instanceof MapBlock || other instanceof FallingBlock)
+        if (other instanceof MapBlock || other instanceof StaticBlock)
           return "slide"
       },
     )
