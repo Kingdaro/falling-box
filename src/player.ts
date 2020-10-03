@@ -1,4 +1,5 @@
 import { Collider } from "./collision"
+import { FallingBlock } from "./falling-block"
 import { getAxis, isButtonDown, wasButtonPressed } from "./gamepad"
 import { context } from "./graphics"
 import { isDown, wasPressed } from "./keyboard"
@@ -27,7 +28,7 @@ export class Player {
 
   respawn(collider: Collider, map: WorldMap) {
     this.rect.top = -respawnHeight
-    this.rect.left = randomRange(map.left, map.right)
+    this.rect.left = randomRange(map.left, map.right - this.rect.width)
     this.xvel = 0
     this.yvel = 0
     collider.setPosition(this, this.rect.left, this.rect.top)
@@ -52,7 +53,8 @@ export class Player {
       this.rect.left + this.xvel * dt,
       this.rect.top + this.yvel * dt,
       (other) => {
-        if (other instanceof MapBlock) return "slide"
+        if (other instanceof MapBlock || other instanceof FallingBlock)
+          return "slide"
       },
     )
     this.rect.setTopLeft(finalX, finalY)
