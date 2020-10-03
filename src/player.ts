@@ -24,7 +24,9 @@ export class Player {
       this,
       this.rect.left + this.xvel * dt,
       this.rect.top + this.yvel * dt,
-      (other) => (other instanceof MapBlock ? "slide" : undefined),
+      (other) => {
+        if (other instanceof MapBlock) return "slide"
+      },
     )
     this.rect.setTopLeft(finalX, finalY)
 
