@@ -17,6 +17,6 @@ export class MapBlock {
 
   draw() {
     context.fillStyle = "white"
-    context.fillRect(...this.rect.values)
+    context.fillRect(...this.rect.valuesRounded)
   }
 }

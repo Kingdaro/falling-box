@@ -22,6 +22,15 @@ export class Rect {
     return [this.left, this.top, this.width, this.height] as const
   }
 
+  get valuesRounded() {
+    return [
+      Math.round(this.left),
+      Math.round(this.top),
+      Math.round(this.width),
+      Math.round(this.height),
+    ] as const
+  }
+
   setTopLeft(left: number, top: number) {
     this.left = left
     this.top = top
