@@ -18,7 +18,7 @@ async function main() {
   let currentTime = await animationFrame()
   while (true) {
     const frameTime = await animationFrame()
-    const elapsed = frameTime - currentTime
+    const elapsed = Math.min(frameTime - currentTime, 100)
     currentTime = frameTime
 
     updateKeyboard()
