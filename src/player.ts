@@ -14,12 +14,14 @@ const jumpSpeed = 900
 const maxJumps = 2
 const falloutDepth = 1000
 const respawnHeight = 500
+const grabDistance = 50
 
 export class Player {
   rect = new Rect(0, 0, 40)
   jumps = maxJumps
   xvel = 0
   yvel = 0
+  direction = 1
 
   constructor(
     private readonly collider: Collider,
@@ -27,6 +29,11 @@ export class Player {
   ) {
     collider.add(this, ...this.rect.values)
     this.respawn()
+  }
+
+  get grabPoint() {
+    const [x, y] = this.rect.center
+    return [x + this.direction * grabDistance, y] as const
   }
 
   respawn() {
@@ -52,6 +59,13 @@ export class Player {
     if (hasJumped() && this.jumps > 0) {
       this.yvel = -jumpSpeed
       this.jumps -= 1
+    }
+
+    if (this.direction < 0 && movementValue() > 0) {
+      this.direction = 1
+    }
+    if (this.direction > 0 && movementValue() < 0) {
+      this.direction = -1
     }
 
     const [finalX, finalY, collisions] = this.collider.move(
@@ -83,6 +97,12 @@ export class Player {
   draw() {
     context.fillStyle = "white"
     context.fillRect(...this.rect.valuesRounded)
+
+    const [grabX, grabY] = this.grabPoint
+    context.beginPath()
+    context.arc(grabX, grabY, 3, 0, Math.PI * 2)
+    context.closePath()
+    context.fill()
   }
 }
 
