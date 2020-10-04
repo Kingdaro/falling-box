@@ -1,27 +1,45 @@
 import { Collider } from "./collision"
+import { Entity, EntityGroup } from "./entity"
 import { context } from "./graphics"
 import { MapBlock, mapBlockSize } from "./map-block"
+import { randomRange, roundToNearest } from "./math"
 import { Rect } from "./rect"
 import { StaticBlock } from "./static-block"
+import { WorldMap } from "./world-map"
 
 const gravity = 800
+const blockSpawnHeight = 1000
 
-export class FallingBlock {
+export class FallingBlock extends Entity {
   rect
   yvel = 0
-  shouldBecomeStatic = false
 
-  constructor(collider: Collider, x: number, y: number) {
-    this.rect = new Rect(x, y, mapBlockSize)
+  constructor(
+    private readonly collider: Collider,
+    private readonly staticBlocks: EntityGroup,
+    map: WorldMap,
+  ) {
+    super()
 
-    const [left, top, width, height] = this.rect.values
-    collider.add(this, left, top, width - 1, height)
+    const x =
+      Math.floor(randomRange(map.left, map.right) / mapBlockSize) * mapBlockSize
+
+    this.rect = new Rect(x, -blockSpawnHeight, mapBlockSize)
   }
 
-  update(dt: number, collider: Collider) {
+  onAdded() {
+    const [left, top, width, height] = this.rect.values
+    this.collider.add(this, left, top, width - 1, height)
+  }
+
+  onRemoved() {
+    this.collider.remove(this)
+  }
+
+  update(dt: number) {
     this.yvel += gravity * dt
 
-    const [finalX, finalY, collisions] = collider.move(
+    const [finalX, finalY, collisions] = this.collider.move(
       this,
       this.rect.left,
       this.rect.top + this.yvel * dt,
@@ -31,8 +49,20 @@ export class FallingBlock {
         }
       },
     )
-    this.rect.setTopLeft(finalX, finalY)
-    this.shouldBecomeStatic = collisions.length > 0
+
+    if (collisions.some((col) => col.normal.y < 0)) {
+      this.destroy()
+
+      this.staticBlocks.add(
+        new StaticBlock(
+          this.collider,
+          finalX,
+          roundToNearest(finalY, mapBlockSize),
+        ),
+      )
+    } else {
+      this.rect.setTopLeft(finalX, finalY)
+    }
   }
 
   draw() {
