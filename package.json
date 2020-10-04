@@ -4,13 +4,15 @@
   "scripts": {
     "dev": "poi --serve --port 8080",
     "build": "poi --prod",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "prepare": "patch-package"
   },
   "dependencies": {
     "bopit": "1.0.2"
   },
   "devDependencies": {
     "@poi/plugin-typescript": "^12.3.1",
+    "patch-package": "^6.2.2",
     "poi": "^12.10.2",
     "prettier": "^2.1.2",
     "typescript": "^4.1.0-beta",
