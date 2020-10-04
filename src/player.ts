@@ -98,11 +98,17 @@ export class Player {
     context.fillStyle = "white"
     context.fillRect(...this.rect.valuesRounded)
 
+    context.save()
+
+    context.globalAlpha = 0.3
+
     const [grabX, grabY] = this.grabPoint
     context.beginPath()
     context.arc(grabX, grabY, 3, 0, Math.PI * 2)
     context.closePath()
     context.fill()
+
+    context.restore()
   }
 }
 
