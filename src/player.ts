@@ -21,22 +21,28 @@ export class Player {
   xvel = 0
   yvel = 0
 
-  constructor(collider: Collider, map: WorldMap) {
+  constructor(
+    private readonly collider: Collider,
+    private readonly map: WorldMap,
+  ) {
     collider.add(this, ...this.rect.values)
-    this.respawn(collider, map)
+    this.respawn()
   }
 
-  respawn(collider: Collider, map: WorldMap) {
+  respawn() {
     this.rect.top = -respawnHeight
-    this.rect.left = randomRange(map.left, map.right - this.rect.width)
+    this.rect.left = randomRange(
+      this.map.left,
+      this.map.right - this.rect.width,
+    )
     this.xvel = 0
     this.yvel = 0
-    collider.setPosition(this, this.rect.left, this.rect.top)
+    this.collider.setPosition(this, this.rect.left, this.rect.top)
   }
 
-  update(dt: number, collider: Collider, map: WorldMap) {
+  update(dt: number) {
     if (this.rect.top >= falloutDepth) {
-      this.respawn(collider, map)
+      this.respawn()
       return
     }
 
@@ -48,7 +54,7 @@ export class Player {
       this.jumps -= 1
     }
 
-    const [finalX, finalY, collisions] = collider.move(
+    const [finalX, finalY, collisions] = this.collider.move(
       this,
       this.rect.left + this.xvel * dt,
       this.rect.top + this.yvel * dt,

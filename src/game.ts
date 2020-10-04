@@ -25,7 +25,7 @@ export class Game {
     this.fallingBlocks.update(dt)
     this.staticBlocks.update(dt)
 
-    this.player.update(dt, this.collider, this.map)
+    this.player.update(dt)
 
     const [x, y] = this.player.rect.center
     this.camera.moveTowards(x, y + verticalCameraOffset, dt * cameraStiffness)
