@@ -7,8 +7,9 @@ import { Rect } from "./rect"
 import { StaticBlock } from "./static-block"
 import { WorldMap } from "./world-map"
 
+const blockSpawnHeight = 1500
 const gravity = 800
-const blockSpawnHeight = 1000
+const terminalVelocity = 800
 
 export class FallingBlock extends Entity {
   rect
@@ -37,7 +38,7 @@ export class FallingBlock extends Entity {
   }
 
   update(dt: number) {
-    this.yvel += gravity * dt
+    this.yvel = Math.min(this.yvel + gravity * dt, terminalVelocity)
 
     const [finalX, finalY, collisions] = this.collider.move(
       this,

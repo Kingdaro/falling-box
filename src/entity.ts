@@ -31,7 +31,7 @@ export class EntityGroup {
 
     for (const ent of this.entities) {
       if (ent.shouldDestroy) {
-        this.entities.delete(ent)
+        this.remove(ent)
       }
     }
   }

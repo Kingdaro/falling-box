@@ -9,6 +9,7 @@ import { Player } from "./player"
 import { WorldMap } from "./world-map"
 
 const cameraStiffness = 8
+const verticalCameraOffset = -150
 
 export class Game {
   collider = new Collider(mapBlockSize)
@@ -18,14 +19,16 @@ export class Game {
 
   fallingBlocks = new EntityGroup()
   staticBlocks = new EntityGroup()
-  blockSpawnClock = new Clock(0.5)
+  blockSpawnClock = new Clock(0.3)
 
   update(dt: number) {
     this.fallingBlocks.update(dt)
     this.staticBlocks.update(dt)
 
     this.player.update(dt, this.collider, this.map)
-    this.camera.moveTowards(...this.player.rect.center, dt * cameraStiffness)
+
+    const [x, y] = this.player.rect.center
+    this.camera.moveTowards(x, y + verticalCameraOffset, dt * cameraStiffness)
 
     while (this.blockSpawnClock.advance(dt)) {
       this.fallingBlocks.add(

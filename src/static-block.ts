@@ -6,6 +6,7 @@ import { Rect } from "./rect"
 
 export class StaticBlock extends Entity {
   rect
+  life = 15
 
   constructor(private readonly collider: Collider, x: number, y: number) {
     super()
@@ -19,6 +20,13 @@ export class StaticBlock extends Entity {
 
   onRemoved() {
     this.collider.remove(this)
+  }
+
+  update(dt: number) {
+    this.life -= dt
+    if (this.life <= 0) {
+      this.destroy()
+    }
   }
 
   draw() {
