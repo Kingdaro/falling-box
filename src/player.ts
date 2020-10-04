@@ -9,8 +9,8 @@ import { StaticBlock } from "./static-block"
 import { WorldMap } from "./world-map"
 
 const speed = 500
-const gravity = 2500
-const jumpSpeed = 800
+const gravity = 2600
+const jumpSpeed = 900
 const maxJumps = 2
 const falloutDepth = 1000
 const respawnHeight = 500
