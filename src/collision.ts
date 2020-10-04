@@ -23,6 +23,7 @@ export class Collider {
     body.add(this.world)
   }
 
+  // TODO: make this return an object instead of a tuple
   move(obj: object, left: number, top: number, filter?: ColliderFilterFn) {
     const body = this.bodiesByObject.get(obj) ?? raise("body not found")
     return body.move(left, top, (body, ...args) => {
