@@ -20,9 +20,13 @@ declare module "bopit" {
   }
 
   export type Collision = {
-    intersection: number[] // ??? i have no idea what this is
+    intersection: number
     normal: { x: number; y: number }
     touch: { x: number; y: number }
+    move: { x: number; y: number }
+    respType: ResponseType
+    body: Body
+    distance: number
   }
 
   export type MoveFilter = (
