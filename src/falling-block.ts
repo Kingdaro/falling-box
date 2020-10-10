@@ -1,4 +1,4 @@
-import { Collider } from "./collision"
+import { Collider } from "./collision.old"
 import { Entity, EntityGroup } from "./entity"
 import { context } from "./graphics"
 import { MapBlock, mapBlockSize } from "./map-block"

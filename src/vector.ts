@@ -32,6 +32,10 @@ export class Vector {
   components() {
     return [this.x, this.y] as const
   }
+
+  dotProduct(other: Vector) {
+    return this.x * other.y + this.y * other.x
+  }
 }
 
 const resolveVector = (other: Vector | number): Vector =>

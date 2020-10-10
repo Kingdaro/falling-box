@@ -1,4 +1,4 @@
-import { Collider } from "./collision"
+import { Collider } from "./collision.old"
 import { getAxis, isButtonDown, wasButtonPressed } from "./gamepad"
 import { context } from "./graphics"
 import { isDown, wasPressed } from "./keyboard"

@@ -1,6 +1,6 @@
 import { Camera } from "./camera"
 import { Clock } from "./clock"
-import { Collider } from "./collision"
+import { Collider } from "./collision.old"
 import { EntityGroup } from "./entity"
 import { FallingBlock } from "./falling-block"
 import { canvas, context } from "./graphics"

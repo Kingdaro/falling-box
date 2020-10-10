@@ -1,4 +1,4 @@
-import { Collider } from "./collision"
+import { Collider } from "./collision.old"
 import { MapBlock, mapBlockSize } from "./map-block"
 import { floorToNearest, randomRange } from "./math"
 
