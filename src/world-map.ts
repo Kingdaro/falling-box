@@ -1,5 +1,6 @@
 import { Collider } from "./collision"
-import { MapBlock } from "./map-block"
+import { MapBlock, mapBlockSize } from "./map-block"
+import { floorToNearest, randomRange } from "./math"
 
 export class WorldMap {
   private readonly blocks = [
@@ -8,8 +9,12 @@ export class WorldMap {
     new MapBlock(2, 2, 36, 1),
   ]
 
-  readonly left = Math.min(...this.blocks.map((block) => block.rect.left))
-  readonly right = Math.max(...this.blocks.map((block) => block.rect.right))
+  private readonly left = Math.min(
+    ...this.blocks.map((block) => block.rect.left),
+  )
+  private readonly right = Math.max(
+    ...this.blocks.map((block) => block.rect.right),
+  )
 
   constructor(collider: Collider) {
     for (const block of this.blocks) {
@@ -21,5 +26,9 @@ export class WorldMap {
     for (const block of this.blocks) {
       block.draw()
     }
+  }
+
+  spawnPosition() {
+    return floorToNearest(randomRange(this.left, this.right), mapBlockSize)
   }
 }

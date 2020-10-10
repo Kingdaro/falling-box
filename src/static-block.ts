@@ -3,14 +3,15 @@ import { Entity } from "./entity"
 import { context } from "./graphics"
 import { mapBlockSize } from "./map-block"
 import { Rect } from "./rect"
+import { vec, Vector } from "./vector"
 
 export class StaticBlock extends Entity {
   rect
   life = 15
 
-  constructor(private readonly collider: Collider, x: number, y: number) {
+  constructor(private readonly collider: Collider, position: Vector) {
     super()
-    this.rect = new Rect(x, y, mapBlockSize)
+    this.rect = new Rect(vec(mapBlockSize), position)
   }
 
   onAdded() {

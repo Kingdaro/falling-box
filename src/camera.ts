@@ -1,21 +1,25 @@
-import { canvas, context } from "./graphics"
+import { context, dimensions } from "./graphics"
 import { lerpClamped } from "./math"
+import { vec, Vector } from "./vector"
 
 export class Camera {
-  left = 0
-  top = 0
+  position = vec()
 
-  moveTowards(left: number, top: number, delta: number) {
-    this.left = lerpClamped(this.left, left, delta)
-    this.top = lerpClamped(this.top, top, delta)
+  moveTowards(position: Vector, delta: number) {
+    this.position = vec(
+      lerpClamped(this.position.x, position.x, delta),
+      lerpClamped(this.position.y, position.y, delta),
+    )
   }
 
   apply(block: () => void) {
+    const translation = this.position
+      .times(-1)
+      .plus(dimensions().dividedBy(2))
+      .rounded()
+
     context.save()
-    context.translate(
-      Math.round(-this.left + canvas.width / 2),
-      Math.round(-this.top + canvas.height / 2),
-    )
+    context.translate(...translation.components())
     block()
     context.restore()
   }

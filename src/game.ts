@@ -6,10 +6,11 @@ import { FallingBlock } from "./falling-block"
 import { canvas, context } from "./graphics"
 import { mapBlockSize } from "./map-block"
 import { Player } from "./player"
+import { vec } from "./vector"
 import { WorldMap } from "./world-map"
 
 const cameraStiffness = 8
-const verticalCameraOffset = -150
+const cameraOffset = vec(0, -150)
 
 export class Game {
   collider = new Collider(mapBlockSize)
@@ -27,8 +28,10 @@ export class Game {
 
     this.player.update(dt)
 
-    const [x, y] = this.player.rect.center
-    this.camera.moveTowards(x, y + verticalCameraOffset, dt * cameraStiffness)
+    this.camera.moveTowards(
+      this.player.rect.center.plus(cameraOffset),
+      dt * cameraStiffness,
+    )
 
     while (this.blockSpawnClock.advance(dt)) {
       this.fallingBlocks.add(

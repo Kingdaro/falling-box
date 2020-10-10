@@ -1,10 +1,23 @@
+import { vec, Vector } from "./vector"
+
 export class Rect {
-  constructor(
-    public left: number,
-    public top: number,
-    public width: number,
-    public height = width,
-  ) {}
+  constructor(public size: Vector, public position = vec()) {}
+
+  get width() {
+    return this.size.x
+  }
+
+  get height() {
+    return this.size.y
+  }
+
+  get left() {
+    return this.position.x
+  }
+
+  get top() {
+    return this.position.y
+  }
 
   get right() {
     return this.left + this.width
@@ -15,29 +28,17 @@ export class Rect {
   }
 
   get center() {
-    return [this.left + this.width / 2, this.top + this.height / 2] as const
+    return this.position.plus(this.size.dividedBy(2))
   }
 
   get values() {
-    return [this.left, this.top, this.width, this.height] as const
+    return [...this.position.components(), ...this.size.components()] as const
   }
 
   get valuesRounded() {
     return [
-      Math.round(this.left),
-      Math.round(this.top),
-      Math.round(this.width),
-      Math.round(this.height),
+      ...this.position.rounded().components(),
+      ...this.size.rounded().components(),
     ] as const
-  }
-
-  setTopLeft(left: number, top: number) {
-    this.left = left
-    this.top = top
-  }
-
-  move(leftDelta: number, topDelta: number) {
-    this.left += leftDelta
-    this.top += topDelta
   }
 }

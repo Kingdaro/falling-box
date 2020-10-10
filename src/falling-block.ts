@@ -2,12 +2,13 @@ import { Collider } from "./collision"
 import { Entity, EntityGroup } from "./entity"
 import { context } from "./graphics"
 import { MapBlock, mapBlockSize } from "./map-block"
-import { randomRange, roundToNearest } from "./math"
+import { roundToNearest } from "./math"
 import { Rect } from "./rect"
 import { StaticBlock } from "./static-block"
+import { vec } from "./vector"
 import { WorldMap } from "./world-map"
 
-const blockSpawnHeight = 1500
+const verticalSpawnPosition = -1500
 const gravity = 800
 const terminalVelocity = 800
 
@@ -22,10 +23,10 @@ export class FallingBlock extends Entity {
   ) {
     super()
 
-    const x =
-      Math.floor(randomRange(map.left, map.right) / mapBlockSize) * mapBlockSize
-
-    this.rect = new Rect(x, -blockSpawnHeight, mapBlockSize)
+    this.rect = new Rect(
+      vec(mapBlockSize),
+      vec(map.spawnPosition(), verticalSpawnPosition),
+    )
   }
 
   onAdded() {
@@ -57,12 +58,11 @@ export class FallingBlock extends Entity {
       this.staticBlocks.add(
         new StaticBlock(
           this.collider,
-          finalX,
-          roundToNearest(finalY, mapBlockSize),
+          vec(finalX, roundToNearest(finalY, mapBlockSize)),
         ),
       )
     } else {
-      this.rect.setTopLeft(finalX, finalY)
+      this.rect.position = vec(finalX, finalY)
     }
   }
 

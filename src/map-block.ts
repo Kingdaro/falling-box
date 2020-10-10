@@ -1,5 +1,6 @@
 import { context } from "./graphics"
 import { Rect } from "./rect"
+import { vec } from "./vector"
 
 export const mapBlockSize = 50
 
@@ -8,10 +9,8 @@ export class MapBlock {
 
   constructor(left: number, top: number, width: number, height: number) {
     this.rect = new Rect(
-      left * mapBlockSize,
-      top * mapBlockSize,
-      width * mapBlockSize,
-      height * mapBlockSize,
+      vec(width, height).map((v) => v * mapBlockSize),
+      vec(left, top).map((v) => v * mapBlockSize),
     )
   }
 

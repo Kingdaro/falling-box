@@ -3,9 +3,9 @@ import { getAxis, isButtonDown, wasButtonPressed } from "./gamepad"
 import { context } from "./graphics"
 import { isDown, wasPressed } from "./keyboard"
 import { MapBlock } from "./map-block"
-import { randomRange } from "./math"
 import { Rect } from "./rect"
 import { StaticBlock } from "./static-block"
+import { vec } from "./vector"
 import { WorldMap } from "./world-map"
 
 const speed = 500
@@ -17,11 +17,10 @@ const respawnHeight = 500
 const grabDistance = 50
 
 export class Player {
-  rect = new Rect(0, 0, 40)
+  rect = new Rect(vec(40))
   jumps = maxJumps
-  xvel = 0
-  yvel = 0
-  direction = 1
+  velocity = vec()
+  direction: 1 | -1 = 1
 
   constructor(
     private readonly collider: Collider,
@@ -31,19 +30,13 @@ export class Player {
     this.respawn()
   }
 
-  get grabPoint() {
-    const [x, y] = this.rect.center
-    return [x + this.direction * grabDistance, y] as const
+  get grabPosition() {
+    return this.rect.center.plus(vec(grabDistance * this.direction, 0))
   }
 
   respawn() {
-    this.rect.top = -respawnHeight
-    this.rect.left = randomRange(
-      this.map.left,
-      this.map.right - this.rect.width,
-    )
-    this.xvel = 0
-    this.yvel = 0
+    this.rect.position = vec(this.map.spawnPosition(), -respawnHeight)
+    this.velocity = vec()
     this.collider.setPosition(this, this.rect.left, this.rect.top)
   }
 
@@ -53,11 +46,15 @@ export class Player {
       return
     }
 
-    this.xvel = movementValue() * speed
-    this.yvel += gravity * dt
+    // set velocity for movement
+    this.velocity = vec(movementValue() * speed, this.velocity.y)
 
+    // apply gravity
+    this.velocity = this.velocity.plus(vec(0, gravity * dt))
+
+    // apply jumping velocity and subtract jumps
     if (hasJumped() && this.jumps > 0) {
-      this.yvel = -jumpSpeed
+      this.velocity = vec(this.velocity.x, -jumpSpeed)
       this.jumps -= 1
     }
 
@@ -68,30 +65,25 @@ export class Player {
       this.direction = -1
     }
 
+    const targetPosition = this.rect.position.plus(this.velocity.times(dt))
     const [finalX, finalY, collisions] = this.collider.move(
       this,
-      this.rect.left + this.xvel * dt,
-      this.rect.top + this.yvel * dt,
+      targetPosition.x,
+      targetPosition.y,
       (other) => {
         if (other instanceof MapBlock || other instanceof StaticBlock)
           return "slide"
       },
     )
-    this.rect.setTopLeft(finalX, finalY)
+    this.rect.position = vec(finalX, finalY)
 
+    let [xvel, yvel] = this.velocity.components()
     for (const { normal } of collisions) {
-      if (normal.x !== 0 && Math.sign(normal.x) !== Math.sign(this.xvel)) {
-        this.xvel = 0
-      }
-
-      if (normal.y !== 0 && Math.sign(normal.y) !== Math.sign(this.yvel)) {
-        this.yvel = 0
-      }
-
-      if (normal.y < 0) {
-        this.jumps = maxJumps
-      }
+      if (normal.x !== 0 && Math.sign(normal.x) !== Math.sign(xvel)) xvel = 0
+      if (normal.y !== 0 && Math.sign(normal.y) !== Math.sign(yvel)) yvel = 0
+      if (normal.y < 0) this.jumps = maxJumps
     }
+    this.velocity = vec(xvel, yvel)
   }
 
   draw() {
@@ -102,9 +94,8 @@ export class Player {
 
     context.globalAlpha = 0.3
 
-    const [grabX, grabY] = this.grabPoint
     context.beginPath()
-    context.arc(grabX, grabY, 3, 0, Math.PI * 2)
+    context.arc(...this.grabPosition.rounded().components(), 3, 0, Math.PI * 2)
     context.closePath()
     context.fill()
 
