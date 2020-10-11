@@ -1,5 +1,7 @@
 import { Camera } from "./camera"
+import { Clock } from "./clock"
 import { EntityGroup } from "./entity"
+import { createFallingBlock } from "./falling-block"
 import { canvas, context } from "./graphics"
 import { createPlayer } from "./player"
 import { RectTrait } from "./traits"
@@ -11,12 +13,12 @@ const cameraOffset = vec(0, -150)
 
 export class Game {
   // collider = new Collider(mapBlockSize)
-  // fallingBlocks = new EntityGroup<FallingBlock>()
   // staticBlocks = new EntityGroup<StaticBlock>()
-  // blockSpawnClock = new Clock(0.3)
+  blockSpawnClock = new Clock(0.3)
   world = new EntityGroup()
   map = this.world.add(new WorldMap())
   player = this.world.add(createPlayer(this.map))
+  fallingBlocks = this.world.add(new EntityGroup())
   camera = new Camera()
 
   update(dt: number) {
@@ -30,11 +32,9 @@ export class Game {
       dt * cameraStiffness,
     )
 
-    // while (this.blockSpawnClock.advance(dt)) {
-    //   this.fallingBlocks.add(
-    //     new FallingBlock(this.collider, this.staticBlocks, this.map),
-    //   )
-    // }
+    while (this.blockSpawnClock.advance(dt)) {
+      this.fallingBlocks.add(createFallingBlock(this.map, this.fallingBlocks))
+    }
   }
 
   draw() {

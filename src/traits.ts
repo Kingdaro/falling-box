@@ -34,12 +34,15 @@ export class VelocityTrait implements Trait {
 }
 
 export class GravityTrait implements Trait {
-  constructor(public amount: number) {}
+  constructor(public amount: number, public terminalVelocity = Infinity) {}
 
   update(ent: Entity, dt: number) {
     const velocityTrait = ent.get(VelocityTrait)
     const { velocity } = velocityTrait
-    velocityTrait.velocity = vec(velocity.x, velocity.y + this.amount * dt)
+    velocityTrait.velocity = vec(
+      velocity.x,
+      Math.min(velocity.y + this.amount * dt, this.terminalVelocity),
+    )
   }
 }
 
@@ -64,6 +67,8 @@ export class CollisionTrait implements Trait {
     const collisions: Collision[] = []
 
     for (const entity of sortedByDistance) {
+      if (entity === self) continue
+
       const { rect: otherRect } = entity.get(RectTrait)
       const collision = checkCollision(newRect, otherRect)
       if (collision) {
