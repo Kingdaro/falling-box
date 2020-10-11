@@ -16,6 +16,15 @@ export class Rect {
     return new Rect(this.size, position)
   }
 
+  containsPoint(point: Vector) {
+    return (
+      point.x > this.left &&
+      point.x < this.right &&
+      point.y > this.top &&
+      point.y < this.bottom
+    )
+  }
+
   get width() {
     return this.size.x
   }

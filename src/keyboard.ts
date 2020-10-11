@@ -26,10 +26,10 @@ export function updateKeyboard() {
   let event
   while ((event = eventQueue.pop())) {
     if (event.type === "keydown") {
-      keyStates.set(event.key, "justPressed")
+      keyStates.set(event.code, "justPressed")
     }
     if (event.type === "keyup") {
-      keyStates.set(event.key, "justReleased")
+      keyStates.set(event.code, "justReleased")
     }
   }
 }
@@ -41,4 +41,8 @@ export function isDown(key: string) {
 
 export function wasPressed(key: string) {
   return keyStates.get(key) === "justPressed"
+}
+
+export function wasReleased(key: string) {
+  return keyStates.get(key) === "justReleased"
 }

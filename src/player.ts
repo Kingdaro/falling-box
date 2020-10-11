@@ -1,7 +1,13 @@
 import { Entity, EntityGroup } from "./entity"
-import { getAxis, isButtonDown, wasButtonPressed } from "./gamepad"
+import {
+  getAxis,
+  isButtonDown,
+  wasButtonPressed,
+  wasButtonReleased,
+} from "./gamepad"
 import { context } from "./graphics"
-import { isDown, wasPressed } from "./keyboard"
+import { isDown, wasPressed, wasReleased } from "./keyboard"
+import { mapBlockSize } from "./map-block"
 import { Rect } from "./rect"
 import {
   CollisionTrait,
@@ -35,7 +41,7 @@ export function createPlayer(map: WorldMap, staticBlockGroup: EntityGroup) {
     new GravityTrait(gravity),
     new CollisionTrait(() => [...map.entities, ...staticBlockGroup.entities]),
     new RespawnOnFalloutTrait(map),
-    new GrabTrait(),
+    new GrabTrait(staticBlockGroup),
   ])
 }
 
@@ -60,7 +66,7 @@ class JumpingTrait implements Trait {
       this.jumps = maxJumps
     }
 
-    if (hasJumped() && this.jumps > 0) {
+    if (jumpInputPressed() && this.jumps > 0) {
       entity.get(VelocityTrait).velocity = vec(velocity.x, -jumpSpeed)
       this.jumps -= 1
     }
@@ -83,6 +89,14 @@ class RespawnOnFalloutTrait implements Trait {
 
 class GrabTrait implements Trait {
   private direction: 1 | -1 = 1
+  private grabbing = false
+
+  constructor(private readonly staticBlockGroup: EntityGroup) {}
+
+  private getGrabPosition(ent: Entity) {
+    const { rect } = ent.get(RectTrait)
+    return rect.center.plus(vec(grabDistance * this.direction, 0))
+  }
 
   update(ent: Entity) {
     const { velocity } = ent.get(VelocityTrait)
@@ -92,20 +106,50 @@ class GrabTrait implements Trait {
     if (velocity.x < 0 && this.direction > 0) {
       this.direction = -1
     }
+
+    if (grabInputPressed() && !this.grabbing) {
+      const grabPosition = this.getGrabPosition(ent)
+
+      const grabbed = this.staticBlockGroup.entities.find((ent) => {
+        const { rect } = ent.get(RectTrait)
+        return rect.containsPoint(grabPosition)
+      })
+
+      if (grabbed) {
+        grabbed.destroy()
+        this.grabbing = true
+      }
+    }
+
+    if (grabInputReleased() && this.grabbing) {
+      this.grabbing = false
+      // TODO: make flying block
+    }
   }
 
   draw(ent: Entity) {
-    const { rect } = ent.get(RectTrait)
-    const grabPosition = rect.center.plus(vec(grabDistance * this.direction, 0))
+    const grabPosition = this.getGrabPosition(ent)
 
     context.save()
 
-    context.globalAlpha = 0.3
+    if (this.grabbing) {
+      context.fillStyle = "white"
+      context.fillRect(
+        ...grabPosition
+          .minus(mapBlockSize / 2)
+          .rounded()
+          .components(),
+        mapBlockSize,
+        mapBlockSize,
+      )
+    } else {
+      context.globalAlpha = 0.3
 
-    context.beginPath()
-    context.arc(...grabPosition.rounded().components(), 3, 0, Math.PI * 2)
-    context.closePath()
-    context.fill()
+      context.beginPath()
+      context.arc(...grabPosition.rounded().components(), 3, 0, Math.PI * 2)
+      context.closePath()
+      context.fill()
+    }
 
     context.restore()
   }
@@ -125,4 +169,10 @@ const movementValue = () => {
   return value
 }
 
-const hasJumped = () => wasButtonPressed("a") || wasPressed("ArrowUp")
+const jumpInputPressed = () => wasButtonPressed("a") || wasPressed("ArrowUp")
+
+const grabInputPressed = () =>
+  wasPressed("KeyZ") || wasButtonPressed("x") || wasButtonPressed("b")
+
+const grabInputReleased = () =>
+  wasReleased("KeyZ") || wasButtonReleased("x") || wasButtonReleased("b")

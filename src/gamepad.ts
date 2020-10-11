@@ -76,6 +76,10 @@ export function wasButtonPressed(name: ButtonName) {
   return buttonStates.get(buttonNameMap[name]) === "justPressed"
 }
 
+export function wasButtonReleased(name: ButtonName) {
+  return buttonStates.get(buttonNameMap[name]) === "justReleased"
+}
+
 const deadzone = 0.3
 export function getAxis(name: AxisName) {
   const value = axisValues.get(axisNameMap[name]) ?? 0
