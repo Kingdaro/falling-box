@@ -12,8 +12,6 @@ const cameraStiffness = 8
 const cameraOffset = vec(0, -150)
 
 export class Game {
-  // collider = new Collider(mapBlockSize)
-  // staticBlocks = new EntityGroup<StaticBlock>()
   blockSpawnClock = new Clock(0.3)
   world = new EntityGroup()
   map = this.world.add(new WorldMap())
