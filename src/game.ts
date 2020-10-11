@@ -1,7 +1,7 @@
 import { Camera } from "./camera"
 import { EntityGroup } from "./entity"
 import { canvas, context } from "./graphics"
-import { Player } from "./player"
+import { createPlayer } from "./player"
 import { RectTrait } from "./traits"
 import { vec } from "./vector"
 import { WorldMap } from "./world-map"
@@ -16,7 +16,7 @@ export class Game {
   // blockSpawnClock = new Clock(0.3)
   world = new EntityGroup()
   map = this.world.add(new WorldMap())
-  player = this.world.add(new Player(this.map))
+  player = this.world.add(createPlayer(this.map))
   camera = new Camera()
 
   update(dt: number) {
@@ -29,8 +29,6 @@ export class Game {
       this.player.get(RectTrait).rect.center.plus(cameraOffset),
       dt * cameraStiffness,
     )
-
-    console.log(this.player.get(RectTrait).rect.center.plus(cameraOffset))
 
     // while (this.blockSpawnClock.advance(dt)) {
     //   this.fallingBlocks.add(

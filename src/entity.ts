@@ -1,7 +1,7 @@
 import { raise } from "./helpers"
 import { Trait } from "./traits"
 
-export abstract class Entity {
+export class Entity {
   private traits = new Map<Function, Trait>()
   shouldDestroy = false
 
