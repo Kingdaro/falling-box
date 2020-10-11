@@ -25,7 +25,7 @@ export class FallingBlock extends Entity {
 
     this.rect = new Rect(
       vec(mapBlockSize),
-      vec(map.spawnPosition(), verticalSpawnPosition),
+      vec(map.getRespawnPosition(), verticalSpawnPosition),
     )
   }
 

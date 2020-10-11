@@ -1,7 +1,14 @@
 import { Rect } from "./rect"
-import { vec } from "./vector"
+import { vec, Vector } from "./vector"
 
-export function checkCollision(first: Rect, second: Rect) {
+export type Collision = {
+  displacement: Vector
+}
+
+export function checkCollision(
+  first: Rect,
+  second: Rect,
+): Collision | undefined {
   if (!first.intersects(second)) return
 
   const displacementX =

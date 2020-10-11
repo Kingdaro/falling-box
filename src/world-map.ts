@@ -1,34 +1,25 @@
-import { Collider } from "./collision.old"
+import { EntityGroup } from "./entity"
 import { MapBlock, mapBlockSize } from "./map-block"
 import { floorToNearest, randomRange } from "./math"
 
-export class WorldMap {
-  readonly blocks = [
-    new MapBlock(0, 0, 40, 1),
-    new MapBlock(1, 1, 38, 1),
-    new MapBlock(2, 2, 36, 1),
-  ] as const
+export class WorldMap extends EntityGroup<MapBlock> {
+  private readonly left
+  private readonly right
 
-  private readonly left = Math.min(
-    ...this.blocks.map((block) => block.rect.left),
-  )
-  private readonly right = Math.max(
-    ...this.blocks.map((block) => block.rect.right),
-  )
+  constructor() {
+    super()
 
-  constructor(collider: Collider) {
-    for (const block of this.blocks) {
-      collider.add(block, ...block.rect.values)
-    }
+    this.add(new MapBlock(0, 0, 40, 1))
+    this.add(new MapBlock(1, 1, 38, 1))
+    this.add(new MapBlock(2, 2, 36, 1))
+
+    this.left = Math.min(...[...this.entities].map((block) => block.rect.left))
+    this.right = Math.max(
+      ...[...this.entities].map((block) => block.rect.right),
+    )
   }
 
-  draw() {
-    for (const block of this.blocks) {
-      block.draw()
-    }
-  }
-
-  spawnPosition() {
+  getRespawnPosition() {
     return floorToNearest(randomRange(this.left, this.right), mapBlockSize)
   }
 }
