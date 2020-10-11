@@ -1,6 +1,13 @@
 export class Vector {
-  // TODO: add withX and withY helpers
   constructor(public readonly x: number, public readonly y: number) {}
+
+  withX(value: number) {
+    return new Vector(value, this.y)
+  }
+
+  withY(value: number) {
+    return new Vector(this.x, value)
+  }
 
   plus(other: Vector | number) {
     other = resolveVector(other)
@@ -43,7 +50,7 @@ export class Vector {
   }
 }
 
+export const vec = (x = 0, y = x) => new Vector(x, y)
+
 const resolveVector = (other: Vector | number): Vector =>
   typeof other === "number" ? new Vector(other, other) : other
-
-export const vec = (x = 0, y = x) => new Vector(x, y)
