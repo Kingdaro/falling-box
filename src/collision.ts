@@ -41,9 +41,9 @@ export function getCollision(
       ? targetRect.bottom - movingRect.top
       : targetRect.top - movingRect.bottom
 
-  const xEntry = movementDelta.x === 0 ? Infinity : xInvEntry / movementDelta.x
+  const xEntry = movementDelta.x === 0 ? -Infinity : xInvEntry / movementDelta.x
   const xExit = movementDelta.x === 0 ? Infinity : xInvExit / movementDelta.x
-  const yEntry = movementDelta.y === 0 ? Infinity : yInvEntry / movementDelta.y
+  const yEntry = movementDelta.y === 0 ? -Infinity : yInvEntry / movementDelta.y
   const yExit = movementDelta.y === 0 ? Infinity : yInvExit / movementDelta.y
 
   const entryTime = Math.max(xEntry, yEntry)
@@ -61,13 +61,13 @@ export function getCollision(
 
   if (xEntry > yEntry) {
     return {
-      normal: vec(Math.sign(xInvEntry), 0),
+      normal: vec(-Math.sign(xInvEntry), 0),
       distance: entryTime,
       movementDelta,
     }
   } else {
     return {
-      normal: vec(0, Math.sign(yInvEntry)),
+      normal: vec(0, -Math.sign(yInvEntry)),
       distance: entryTime,
       movementDelta,
     }
@@ -76,12 +76,8 @@ export function getCollision(
 
 export function resolveTouch(
   movingRect: Rect,
-  targetRect: Rect,
-  targetPosition: Vector,
-): Resolution | undefined {
-  const collision = getCollision(movingRect, targetRect, targetPosition)
-  if (!collision) return
-
+  collision: Collision,
+): Resolution {
   return {
     normal: collision.normal,
     finalPosition: movingRect.position.plus(
@@ -92,18 +88,16 @@ export function resolveTouch(
 
 export function resolveSlide(
   movingRect: Rect,
-  targetRect: Rect,
-  targetPosition: Vector,
-): Resolution | undefined {
-  const collision = getCollision(movingRect, targetRect, targetPosition)
-  if (!collision) return
-
+  collision: Collision,
+): Resolution {
   const remainingDistance = 1 - collision.distance
   const dotProduct = collision.movementDelta.dotProduct(collision.normal)
 
   const finalPosition = movingRect.position
     .plus(collision.movementDelta.times(collision.distance))
     .plus(collision.normal.times(dotProduct * remainingDistance))
+
+  debugger
 
   return {
     normal: collision.normal,
