@@ -1,4 +1,4 @@
-import { Entity } from "./entity"
+import { Entity, EntityGroup } from "./entity"
 import { getAxis, isButtonDown, wasButtonPressed } from "./gamepad"
 import { context } from "./graphics"
 import { isDown, wasPressed } from "./keyboard"
@@ -23,7 +23,7 @@ const falloutDepth = 1000
 const respawnHeight = 500
 const grabDistance = 50
 
-export function createPlayer(map: WorldMap) {
+export function createPlayer(map: WorldMap, staticBlockGroup: EntityGroup) {
   return new Entity([
     new RectTrait(
       new Rect(vec(size), vec(map.getRespawnPosition(), -respawnHeight)),
@@ -33,13 +33,13 @@ export function createPlayer(map: WorldMap) {
     new JumpingTrait(),
     new VelocityTrait(),
     new GravityTrait(gravity),
-    new CollisionTrait(() => [...map.entities]),
+    new CollisionTrait(() => [...map.entities, ...staticBlockGroup.entities]),
     new RespawnOnFalloutTrait(map),
     new GrabTrait(),
   ])
 }
 
-export class MovementTrait implements Trait {
+class MovementTrait implements Trait {
   update(ent: Entity) {
     const velocityTrait = ent.get(VelocityTrait)
     velocityTrait.velocity = vec(
@@ -49,7 +49,7 @@ export class MovementTrait implements Trait {
   }
 }
 
-export class JumpingTrait implements Trait {
+class JumpingTrait implements Trait {
   jumps = maxJumps
 
   update(entity: Entity) {
@@ -67,7 +67,7 @@ export class JumpingTrait implements Trait {
   }
 }
 
-export class RespawnOnFalloutTrait implements Trait {
+class RespawnOnFalloutTrait implements Trait {
   constructor(private readonly map: WorldMap) {}
 
   update(ent: Entity) {
@@ -81,7 +81,7 @@ export class RespawnOnFalloutTrait implements Trait {
   }
 }
 
-export class GrabTrait implements Trait {
+class GrabTrait implements Trait {
   private direction: 1 | -1 = 1
 
   update(ent: Entity) {

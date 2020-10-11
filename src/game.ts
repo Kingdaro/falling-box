@@ -17,14 +17,12 @@ export class Game {
   blockSpawnClock = new Clock(0.3)
   world = new EntityGroup()
   map = this.world.add(new WorldMap())
-  player = this.world.add(createPlayer(this.map))
-  fallingBlocks = this.world.add(new EntityGroup())
+  staticBlockGroup = this.world.add(new EntityGroup())
+  player = this.world.add(createPlayer(this.map, this.staticBlockGroup))
+  fallingBlockGroup = this.world.add(new EntityGroup())
   camera = new Camera()
 
   update(dt: number) {
-    // this.fallingBlocks.update(dt)
-    // this.staticBlocks.update(dt)
-
     this.world.update(dt)
 
     this.camera.moveTowards(
@@ -33,7 +31,9 @@ export class Game {
     )
 
     while (this.blockSpawnClock.advance(dt)) {
-      this.fallingBlocks.add(createFallingBlock(this.map, this.fallingBlocks))
+      this.fallingBlockGroup.add(
+        createFallingBlock(this.map, this.staticBlockGroup),
+      )
     }
   }
 
@@ -42,10 +42,6 @@ export class Game {
 
     this.camera.apply(() => {
       this.world.draw()
-      // this.map.draw()
-      // this.staticBlocks.draw()
-      // this.fallingBlocks.draw()
-      // this.player.draw()
     })
   }
 }

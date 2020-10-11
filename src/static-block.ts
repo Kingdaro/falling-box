@@ -1,37 +1,24 @@
-import { Collider } from "./collision.old"
 import { Entity } from "./entity"
-import { context } from "./graphics"
 import { mapBlockSize } from "./map-block"
 import { Rect } from "./rect"
+import { DrawRectTrait, RectTrait, Trait } from "./traits"
 import { vec, Vector } from "./vector"
 
-export class StaticBlock extends Entity {
-  rect
-  life = 15
+export function createStaticBlock(position: Vector) {
+  return new Entity([
+    new RectTrait(new Rect(vec(mapBlockSize), position)),
+    new DrawRectTrait(),
+    new TimedRemovalTrait(),
+  ])
+}
 
-  constructor(private readonly collider: Collider, position: Vector) {
-    super()
-    this.rect = new Rect(vec(mapBlockSize), position)
-  }
+class TimedRemovalTrait implements Trait {
+  time = 15
 
-  onAdded() {
-    const [left, top, width, height] = this.rect.values
-    this.collider.add(this, left, top, width - 1, height)
-  }
-
-  onRemoved() {
-    this.collider.remove(this)
-  }
-
-  update(dt: number) {
-    this.life -= dt
-    if (this.life <= 0) {
-      this.destroy()
+  update(entity: Entity, dt: number) {
+    this.time -= dt
+    if (this.time < 0) {
+      entity.destroy()
     }
-  }
-
-  draw() {
-    context.fillStyle = "white"
-    context.fillRect(...this.rect.valuesRounded)
   }
 }

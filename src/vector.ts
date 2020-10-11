@@ -1,4 +1,5 @@
 export class Vector {
+  // TODO: add withX and withY helpers
   constructor(public readonly x: number, public readonly y: number) {}
 
   plus(other: Vector | number) {

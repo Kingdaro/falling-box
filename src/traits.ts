@@ -11,6 +11,7 @@ export interface Trait {
 }
 
 export class RectTrait {
+  // TODO: simplify this by taking the args for Rect instead of a rect
   constructor(public rect: Rect) {}
 }
 
