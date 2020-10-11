@@ -11,7 +11,7 @@ export abstract class Entity {
   }
 }
 
-export class EntityGroup<E extends Entity = Entity> {
+export class EntityGroup<E extends Entity = Entity> extends Entity {
   entities = new Set<E>()
 
   add(ent: E) {
