@@ -1,9 +1,11 @@
-import { getCollision, resolveSlide } from "./collision"
+import { checkCollision } from "./collision"
+import { EntityGroup } from "./entity"
 import { getAxis, isButtonDown, wasButtonPressed } from "./gamepad"
 import { context } from "./graphics"
 import { compare } from "./helpers"
 import { isDown, wasPressed } from "./keyboard"
 import { Rect } from "./rect"
+import { StaticBlock } from "./static-block"
 import { vec } from "./vector"
 import { WorldMap } from "./world-map"
 
@@ -21,9 +23,11 @@ export class Player {
   velocity = vec()
   direction: 1 | -1 = 1
   private readonly map
+  private readonly staticBlocks
 
-  constructor(map: WorldMap) {
+  constructor(map: WorldMap, staticBlocks: EntityGroup<StaticBlock>) {
     this.map = map
+    this.staticBlocks = staticBlocks
     this.respawn()
   }
 
@@ -65,27 +69,40 @@ export class Player {
   }
 
   private moveColliding(dt: number) {
-    const sortedByDistance = this.map.blocks
+    const sortedByDistance = [...this.map.blocks, ...this.staticBlocks.entities]
       .slice()
       .sort(compare((block) => this.rect.center.distanceTo(block.rect.center)))
 
-    let newPosition = this.rect.position.plus(this.velocity.times(dt))
+    let newRect = this.rect.withPosition(
+      this.rect.position.plus(this.velocity.times(dt)),
+    )
     let [xvel, yvel] = this.velocity.components()
 
     for (const block of sortedByDistance) {
-      const collision = getCollision(this.rect, block.rect, newPosition)
+      const collision = checkCollision(newRect, block.rect)
       if (collision) {
-        const { finalPosition, normal } = resolveSlide(this.rect, collision)
+        const { displacement } = collision
+        newRect = newRect.withPosition(newRect.position.plus(displacement))
 
-        newPosition = finalPosition
+        if (
+          displacement.x !== 0 &&
+          Math.sign(displacement.x) !== Math.sign(xvel)
+        ) {
+          xvel = 0
+        }
 
-        if (normal.x !== 0 && Math.sign(normal.x) !== Math.sign(xvel)) xvel = 0
-        if (normal.y !== 0 && Math.sign(normal.y) !== Math.sign(yvel)) yvel = 0
-        if (normal.y < 0) this.jumps = maxJumps
+        if (
+          displacement.y !== 0 &&
+          Math.sign(displacement.y) !== Math.sign(yvel)
+        ) {
+          yvel = 0
+        }
+
+        if (displacement.y < 0) this.jumps = maxJumps
       }
     }
 
-    this.rect.position = newPosition
+    this.rect = newRect
     this.velocity = vec(xvel, yvel)
   }
 

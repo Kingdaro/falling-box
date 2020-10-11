@@ -11,15 +11,15 @@ export abstract class Entity {
   }
 }
 
-export class EntityGroup {
-  entities = new Set<Entity>()
+export class EntityGroup<E extends Entity = Entity> {
+  entities = new Set<E>()
 
-  add(ent: Entity) {
+  add(ent: E) {
     this.entities.add(ent)
     ent.onAdded?.()
   }
 
-  remove(ent: Entity) {
+  remove(ent: E) {
     this.entities.delete(ent)
     ent.onRemoved?.()
   }

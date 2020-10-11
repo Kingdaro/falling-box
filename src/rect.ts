@@ -3,6 +3,19 @@ import { vec, Vector } from "./vector"
 export class Rect {
   constructor(public size: Vector, public position = vec()) {}
 
+  intersects(other: Rect) {
+    return (
+      this.right > other.left &&
+      this.left < other.right &&
+      this.bottom > other.top &&
+      this.top < other.bottom
+    )
+  }
+
+  withPosition(position: Vector) {
+    return new Rect(this.size, position)
+  }
+
   get width() {
     return this.size.x
   }

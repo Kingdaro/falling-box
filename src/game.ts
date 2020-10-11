@@ -6,6 +6,7 @@ import { FallingBlock } from "./falling-block"
 import { canvas, context } from "./graphics"
 import { mapBlockSize } from "./map-block"
 import { Player } from "./player"
+import { StaticBlock } from "./static-block"
 import { vec } from "./vector"
 import { WorldMap } from "./world-map"
 
@@ -14,11 +15,11 @@ const cameraOffset = vec(0, -150)
 
 export class Game {
   collider = new Collider(mapBlockSize)
-  fallingBlocks = new EntityGroup()
-  staticBlocks = new EntityGroup()
+  fallingBlocks = new EntityGroup<FallingBlock>()
+  staticBlocks = new EntityGroup<StaticBlock>()
   blockSpawnClock = new Clock(0.3)
   map = new WorldMap(this.collider)
-  player = new Player(this.map)
+  player = new Player(this.map, this.staticBlocks)
   camera = new Camera()
 
   update(dt: number) {
