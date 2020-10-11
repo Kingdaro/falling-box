@@ -33,6 +33,10 @@ export class Vector {
     return [this.x, this.y] as const
   }
 
+  distanceTo(other: Vector) {
+    return Math.sqrt((this.x - other.x) ** 2 + (this.y - other.y) ** 2)
+  }
+
   dotProduct(other: Vector) {
     return this.x * other.y + this.y * other.x
   }

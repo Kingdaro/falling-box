@@ -14,13 +14,12 @@ const cameraOffset = vec(0, -150)
 
 export class Game {
   collider = new Collider(mapBlockSize)
-  map = new WorldMap(this.collider)
-  player = new Player(this.collider, this.map)
-  camera = new Camera()
-
   fallingBlocks = new EntityGroup()
   staticBlocks = new EntityGroup()
   blockSpawnClock = new Clock(0.3)
+  map = new WorldMap(this.collider)
+  player = new Player(this.map)
+  camera = new Camera()
 
   update(dt: number) {
     this.fallingBlocks.update(dt)

@@ -1,10 +1,9 @@
-import { Collider } from "./collision.old"
+import { getCollision, resolveSlide } from "./collision"
 import { getAxis, isButtonDown, wasButtonPressed } from "./gamepad"
 import { context } from "./graphics"
+import { compare } from "./helpers"
 import { isDown, wasPressed } from "./keyboard"
-import { MapBlock } from "./map-block"
 import { Rect } from "./rect"
-import { StaticBlock } from "./static-block"
 import { vec } from "./vector"
 import { WorldMap } from "./world-map"
 
@@ -21,12 +20,10 @@ export class Player {
   jumps = maxJumps
   velocity = vec()
   direction: 1 | -1 = 1
+  private readonly map
 
-  constructor(
-    private readonly collider: Collider,
-    private readonly map: WorldMap,
-  ) {
-    collider.add(this, ...this.rect.values)
+  constructor(map: WorldMap) {
+    this.map = map
     this.respawn()
   }
 
@@ -37,7 +34,6 @@ export class Player {
   respawn() {
     this.rect.position = vec(this.map.spawnPosition(), -respawnHeight)
     this.velocity = vec()
-    this.collider.setPosition(this, this.rect.left, this.rect.top)
   }
 
   update(dt: number) {
@@ -65,24 +61,31 @@ export class Player {
       this.direction = -1
     }
 
-    const targetPosition = this.rect.position.plus(this.velocity.times(dt))
-    const [finalX, finalY, collisions] = this.collider.move(
-      this,
-      targetPosition.x,
-      targetPosition.y,
-      (other) => {
-        if (other instanceof MapBlock || other instanceof StaticBlock)
-          return "slide"
-      },
-    )
-    this.rect.position = vec(finalX, finalY)
+    this.moveColliding(dt)
+  }
 
+  private moveColliding(dt: number) {
+    const sortedByDistance = this.map.blocks
+      .slice()
+      .sort(compare((block) => this.rect.center.distanceTo(block.rect.center)))
+
+    let newPosition = this.rect.position.plus(this.velocity.times(dt))
     let [xvel, yvel] = this.velocity.components()
-    for (const { normal } of collisions) {
-      if (normal.x !== 0 && Math.sign(normal.x) !== Math.sign(xvel)) xvel = 0
-      if (normal.y !== 0 && Math.sign(normal.y) !== Math.sign(yvel)) yvel = 0
-      if (normal.y < 0) this.jumps = maxJumps
+
+    for (const block of sortedByDistance) {
+      const collision = getCollision(this.rect, block.rect, newPosition)
+      if (collision) {
+        const { finalPosition, normal } = resolveSlide(this.rect, collision)
+
+        newPosition = finalPosition
+
+        if (normal.x !== 0 && Math.sign(normal.x) !== Math.sign(xvel)) xvel = 0
+        if (normal.y !== 0 && Math.sign(normal.y) !== Math.sign(yvel)) yvel = 0
+        if (normal.y < 0) this.jumps = maxJumps
+      }
     }
+
+    this.rect.position = newPosition
     this.velocity = vec(xvel, yvel)
   }
 

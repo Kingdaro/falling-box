@@ -3,11 +3,11 @@ import { MapBlock, mapBlockSize } from "./map-block"
 import { floorToNearest, randomRange } from "./math"
 
 export class WorldMap {
-  private readonly blocks = [
+  readonly blocks = [
     new MapBlock(0, 0, 40, 1),
     new MapBlock(1, 1, 38, 1),
     new MapBlock(2, 2, 36, 1),
-  ]
+  ] as const
 
   private readonly left = Math.min(
     ...this.blocks.map((block) => block.rect.left),
