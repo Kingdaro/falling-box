@@ -16,6 +16,7 @@ import {
   GravityTrait,
   RectTrait,
   Trait,
+  VelocityResolutionTrait,
   VelocityTrait,
 } from "./traits"
 import { vec } from "./vector"
@@ -45,6 +46,7 @@ export function createPlayer(
     new VelocityTrait(),
     new GravityTrait(gravity),
     new CollisionTrait(() => [...map.entities, ...staticBlockGroup.entities]),
+    new VelocityResolutionTrait(),
     new RespawnOnFalloutTrait(map),
     new GrabTrait(staticBlockGroup, flyingBlockGroup),
   ])
