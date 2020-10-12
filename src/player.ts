@@ -40,7 +40,6 @@ export function createPlayer(
     new RectTrait(
       new Rect(vec(size), vec(map.getRespawnPosition(), -respawnHeight)),
     ),
-    new DrawRectTrait(),
     new MovementTrait(),
     new JumpingTrait(),
     new VelocityTrait(),
@@ -49,6 +48,7 @@ export function createPlayer(
     new VelocityResolutionTrait(),
     new RespawnOnFalloutTrait(map),
     new GrabTrait(staticBlockGroup, flyingBlockGroup),
+    new DrawRectTrait(),
   ])
 }
 
@@ -133,7 +133,9 @@ class GrabTrait implements Trait {
 
     if (grabInputReleased() && this.grabbing) {
       this.grabbing = false
-      this.flyingBlockGroup.add(createFlyingBlock(grabPosition, this.direction))
+      this.flyingBlockGroup.add(
+        createFlyingBlock(grabPosition, this.direction, this.staticBlockGroup),
+      )
     }
   }
 
@@ -141,9 +143,9 @@ class GrabTrait implements Trait {
     const grabPosition = this.getGrabPosition(ent)
 
     context.save()
+    context.fillStyle = "white"
 
     if (this.grabbing) {
-      context.fillStyle = "white"
       context.fillRect(
         ...grabPosition
           .minus(mapBlockSize / 2)
