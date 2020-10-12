@@ -20,7 +20,7 @@ export class DrawRectTrait implements Trait {
 
   draw(ent: Entity) {
     const { rect } = ent.get(RectTrait)
-    context.fillStyle = "white"
+    context.fillStyle = this.color
     context.fillRect(...rect.valuesRounded)
   }
 }
@@ -97,5 +97,16 @@ export class CollisionTrait implements Trait {
     rectTrait.rect = newRect
     velTrait.velocity = vec(xvel, yvel)
     this.collisions = collisions
+  }
+}
+
+export class TimedRemovalTrait implements Trait {
+  constructor(private time: number) {}
+
+  update(entity: Entity, dt: number) {
+    this.time -= dt
+    if (this.time < 0) {
+      entity.destroy()
+    }
   }
 }

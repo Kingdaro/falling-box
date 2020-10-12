@@ -1,4 +1,5 @@
 import { Entity, EntityGroup } from "./entity"
+import { createFlyingBlock } from "./flying-block"
 import {
   getAxis,
   isButtonDown,
@@ -29,7 +30,11 @@ const falloutDepth = 1000
 const respawnHeight = 500
 const grabDistance = 50
 
-export function createPlayer(map: WorldMap, staticBlockGroup: EntityGroup) {
+export function createPlayer(
+  map: WorldMap,
+  staticBlockGroup: EntityGroup,
+  flyingBlockGroup: EntityGroup,
+) {
   return new Entity([
     new RectTrait(
       new Rect(vec(size), vec(map.getRespawnPosition(), -respawnHeight)),
@@ -41,7 +46,7 @@ export function createPlayer(map: WorldMap, staticBlockGroup: EntityGroup) {
     new GravityTrait(gravity),
     new CollisionTrait(() => [...map.entities, ...staticBlockGroup.entities]),
     new RespawnOnFalloutTrait(map),
-    new GrabTrait(staticBlockGroup),
+    new GrabTrait(staticBlockGroup, flyingBlockGroup),
   ])
 }
 
@@ -91,7 +96,10 @@ class GrabTrait implements Trait {
   private direction: 1 | -1 = 1
   private grabbing = false
 
-  constructor(private readonly staticBlockGroup: EntityGroup) {}
+  constructor(
+    private readonly staticBlockGroup: EntityGroup,
+    private readonly flyingBlockGroup: EntityGroup,
+  ) {}
 
   private getGrabPosition(ent: Entity) {
     const { rect } = ent.get(RectTrait)
@@ -107,9 +115,9 @@ class GrabTrait implements Trait {
       this.direction = -1
     }
 
-    if (grabInputPressed() && !this.grabbing) {
-      const grabPosition = this.getGrabPosition(ent)
+    const grabPosition = this.getGrabPosition(ent)
 
+    if (grabInputPressed() && !this.grabbing) {
       const grabbed = this.staticBlockGroup.entities.find((ent) => {
         const { rect } = ent.get(RectTrait)
         return rect.containsPoint(grabPosition)
@@ -123,7 +131,7 @@ class GrabTrait implements Trait {
 
     if (grabInputReleased() && this.grabbing) {
       this.grabbing = false
-      // TODO: make flying block
+      this.flyingBlockGroup.add(createFlyingBlock(grabPosition, this.direction))
     }
   }
 

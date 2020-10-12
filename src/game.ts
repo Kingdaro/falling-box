@@ -16,7 +16,10 @@ export class Game {
   world = new EntityGroup()
   map = this.world.add(new WorldMap())
   staticBlockGroup = this.world.add(new EntityGroup())
-  player = this.world.add(createPlayer(this.map, this.staticBlockGroup))
+  flyingBlockGroup = this.world.add(new EntityGroup())
+  player = this.world.add(
+    createPlayer(this.map, this.staticBlockGroup, this.flyingBlockGroup),
+  )
   fallingBlockGroup = this.world.add(new EntityGroup())
   camera = new Camera()
 
