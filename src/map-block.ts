@@ -10,8 +10,8 @@ export class MapBlock extends Entity {
 		super([
 			new RectTrait(
 				new Rect(
-					vec(width, height).map((v) => v * mapBlockSize),
-					vec(left, top).map((v) => v * mapBlockSize),
+					vec(width * mapBlockSize, height * mapBlockSize),
+					vec(left * mapBlockSize, top * mapBlockSize),
 				),
 			),
 			new DrawRectTrait(),
