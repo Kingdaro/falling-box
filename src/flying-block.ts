@@ -10,8 +10,6 @@ import {
 } from "./traits"
 import { vec, Vector } from "./vector"
 
-const speed = 1000
-
 export function createFlyingBlock(
   centerPosition: Vector,
   direction: 1 | -1,
@@ -21,31 +19,42 @@ export function createFlyingBlock(
     new RectTrait(
       new Rect(vec(mapBlockSize), centerPosition.minus(mapBlockSize / 2)),
     ),
-    new VelocityTrait(vec(direction * speed, 0)),
-    new TimedRemovalTrait(2),
-    new DestructionTrait(staticBlockGroup),
     new DrawRectTrait("green"),
+    new VelocityTrait(),
+    new TimedRemovalTrait(2),
+    new DestructionTrait(direction, staticBlockGroup),
   ])
 }
 
 class DestructionTrait implements Trait {
+  static maxFreezeTime = 0.15
+  static speed = 1000
+
   hits = 3
+  freezeTime = 0
 
-  constructor(private readonly staticBlockGroup: EntityGroup) {}
+  constructor(
+    private readonly direction: number,
+    private readonly staticBlockGroup: EntityGroup,
+  ) {}
 
-  update(entity: Entity) {
+  update(entity: Entity, dt: number) {
     const { rect } = entity.get(RectTrait)
+    const velocityTrait = entity.get(VelocityTrait)
 
-    const hitBlock = this.staticBlockGroup.entities.find((ent) =>
-      ent.get(RectTrait).rect.intersects(rect),
-    )
+    if (this.freezeTime > 0) {
+      velocityTrait.velocity = vec(0, 0)
+      this.freezeTime -= dt
+    } else {
+      velocityTrait.velocity = vec(DestructionTrait.speed * this.direction, 0)
+      const hitBlock = this.staticBlockGroup.entities.find((ent) =>
+        ent.get(RectTrait).rect.intersects(rect),
+      )
 
-    if (hitBlock) {
-      this.hits -= 1
-      if (this.hits > 0) {
-        hitBlock.destroy()
-      } else {
-        entity.destroy()
+      if (hitBlock) {
+        this.hits -= 1
+        this.hits > 0 ? hitBlock.destroy() : entity.destroy()
+        this.freezeTime = DestructionTrait.maxFreezeTime
       }
     }
   }
