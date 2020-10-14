@@ -1,5 +1,5 @@
+import { worldGridScale } from "./constants"
 import { Entity, EntityGroup } from "./entity"
-import { mapBlockSize } from "./map-block"
 import { Rect } from "./rect"
 import {
 	DrawRectTrait,
@@ -17,7 +17,7 @@ export function createFlyingBlock(
 ) {
 	return new Entity([
 		new RectTrait(
-			new Rect(vec(mapBlockSize), centerPosition.minus(mapBlockSize / 2)),
+			new Rect(vec(worldGridScale), centerPosition.minus(worldGridScale / 2)),
 		),
 		new DrawRectTrait("green"),
 		new VelocityTrait(),

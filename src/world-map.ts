@@ -1,5 +1,6 @@
+import { worldGridScale } from "./constants"
 import { EntityGroup } from "./entity"
-import { MapBlock, mapBlockSize } from "./map-block"
+import { MapBlock } from "./map-block"
 import { floorToNearest, randomRange } from "./math"
 
 export class WorldMap extends EntityGroup<MapBlock> {
@@ -20,6 +21,6 @@ export class WorldMap extends EntityGroup<MapBlock> {
 	}
 
 	getRespawnPosition() {
-		return floorToNearest(randomRange(this.left, this.right), mapBlockSize)
+		return floorToNearest(randomRange(this.left, this.right), worldGridScale)
 	}
 }

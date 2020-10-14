@@ -1,5 +1,5 @@
+import { worldGridScale } from "./constants"
 import { Entity, EntityGroup } from "./entity"
-import { mapBlockSize } from "./map-block"
 import { Rect } from "./rect"
 import { createStaticBlock } from "./static-block"
 import {
@@ -24,7 +24,7 @@ export function createFallingBlock(
 	return new Entity([
 		new RectTrait(
 			new Rect(
-				vec(mapBlockSize),
+				vec(worldGridScale),
 				vec(map.getRespawnPosition(), verticalSpawnPosition),
 			),
 		),

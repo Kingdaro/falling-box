@@ -1,3 +1,4 @@
+import { worldGridScale } from "./constants"
 import { Entity, EntityGroup } from "./entity"
 import { createFlyingBlock } from "./flying-block"
 import {
@@ -8,7 +9,6 @@ import {
 } from "./gamepad"
 import { context } from "./graphics"
 import { isDown, wasPressed, wasReleased } from "./keyboard"
-import { mapBlockSize } from "./map-block"
 import { Rect } from "./rect"
 import {
 	CollisionTrait,
@@ -148,11 +148,11 @@ class GrabTrait implements Trait {
 		if (this.grabbing) {
 			context.fillRect(
 				...grabPosition
-					.minus(mapBlockSize / 2)
+					.minus(worldGridScale / 2)
 					.rounded()
 					.components(),
-				mapBlockSize,
-				mapBlockSize,
+				worldGridScale,
+				worldGridScale,
 			)
 		} else {
 			context.globalAlpha = 0.3
