@@ -1,4 +1,4 @@
 interface WindowEventMap {
-  gamepadconnected: GamepadEvent
-  gamepaddisconnected: GamepadEvent
+	gamepadconnected: GamepadEvent
+	gamepaddisconnected: GamepadEvent
 }

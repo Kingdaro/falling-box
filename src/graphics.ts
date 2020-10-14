@@ -7,15 +7,15 @@ canvas.style.display = "block"
 export const context = canvas.getContext("2d")!
 
 export function dimensions() {
-  return vec(canvas.width, canvas.height)
+	return vec(canvas.width, canvas.height)
 }
 
 function sizeCanvasToWindow() {
-  canvas.width = window.innerWidth
-  canvas.height = window.innerHeight
+	canvas.width = window.innerWidth
+	canvas.height = window.innerHeight
 }
 
 export function initGraphics() {
-  sizeCanvasToWindow()
-  window.addEventListener("resize", sizeCanvasToWindow)
+	sizeCanvasToWindow()
+	window.addEventListener("resize", sizeCanvasToWindow)
 }

@@ -5,29 +5,29 @@ import { updateKeyboard } from "./keyboard"
 import "./styles.css"
 
 function animationFrame() {
-  return new Promise(requestAnimationFrame)
+	return new Promise(requestAnimationFrame)
 }
 
 async function main() {
-  initGraphics()
+	initGraphics()
 
-  const app = document.getElementById("app")!
-  app.append(canvas)
+	const app = document.getElementById("app")!
+	app.append(canvas)
 
-  const game = new Game()
+	const game = new Game()
 
-  let currentTime = await animationFrame()
-  while (true) {
-    const frameTime = await animationFrame()
-    const elapsed = Math.min(frameTime - currentTime, 100)
-    currentTime = frameTime
+	let currentTime = await animationFrame()
+	while (true) {
+		const frameTime = await animationFrame()
+		const elapsed = Math.min(frameTime - currentTime, 100)
+		currentTime = frameTime
 
-    updateKeyboard()
-    updateGamepad()
+		updateKeyboard()
+		updateGamepad()
 
-    game.update(elapsed / 1000)
-    game.draw()
-  }
+		game.update(elapsed / 1000)
+		game.draw()
+	}
 }
 
 main().catch(console.error)
