@@ -1,76 +1,64 @@
 import { raise } from "./helpers"
 import { Rect } from "./rect"
-import { Trait } from "./traits"
+import { Trait } from "./trait"
 import { vec } from "./vector"
+import { World } from "./world"
 
 export class Entity {
 	rect = new Rect()
 	velocity = vec()
-	isMarkedForRemoval = false
 
 	private traits = new Map<Function, Trait>()
 
-	constructor(traits: object[] = []) {
+	constructor(traits: Trait[] = []) {
 		for (const trait of traits) {
+			trait.entity = this
 			this.traits.set(trait.constructor, trait)
 		}
 	}
 
-	getOptional<T extends object>(
+	private _world?: World
+
+	set world(world: World) {
+		this._world = world
+	}
+
+	get world() {
+		return this._world ?? raise("Entity must be added to a world")
+	}
+
+	getOptional<T extends Trait>(
 		constructor: new (...args: any[]) => T,
 	): T | undefined {
 		const trait = this.traits.get(constructor)
 		if (trait instanceof constructor) return trait
 	}
 
-	get<T extends object>(constructor: new (...args: any[]) => T): T {
+	get<T extends Trait>(constructor: new (...args: any[]) => T): T {
 		return (
 			this.getOptional(constructor) ??
 			raise(`trait "${constructor.name}" not found`)
 		)
 	}
 
-	destroy() {
-		this.isMarkedForRemoval = true
+	has(traitConstructor: Function) {
+		return this.traits.has(traitConstructor)
 	}
 
 	update(dt: number) {
 		this.rect.position = this.rect.position.plus(this.velocity.times(dt))
-		this.traits.forEach((t) => t.update?.(this, dt))
+		this.traits.forEach((t) => t.update?.(dt))
 	}
 
 	draw() {
-		this.traits.forEach((t) => t.draw?.(this))
-	}
-}
-
-export class EntityGroup<E extends Entity = Entity> extends Entity {
-	private entitySet = new Set<E>()
-
-	get entities() {
-		return [...this.entitySet]
+		this.traits.forEach((t) => t.draw?.())
 	}
 
-	add<TAdded extends E>(ent: TAdded): TAdded {
-		this.entitySet.add(ent)
-		return ent
+	onMessage(message: unknown) {
+		this.traits.forEach((t) => t.onMessage?.(message))
 	}
 
-	remove(ent: E) {
-		this.entitySet.delete(ent)
-	}
-
-	update(dt: number) {
-		this.entitySet.forEach((e) => e.update(dt))
-
-		const removedEntities = [...this.entitySet].filter(
-			(e) => e.isMarkedForRemoval,
-		)
-
-		removedEntities.forEach((e) => this.entitySet.delete(e))
-	}
-
-	draw() {
-		this.entitySet.forEach((ent) => ent.draw())
+	destroy() {
+		this.world.remove(this)
 	}
 }

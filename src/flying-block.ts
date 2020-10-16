@@ -1,18 +1,15 @@
+import { DrawRectTrait, TimedRemovalTrait } from "./common-traits"
 import { worldGridScale } from "./constants"
-import { Entity, EntityGroup } from "./entity"
+import { Entity } from "./entity"
 import { Rect } from "./rect"
-import { DrawRectTrait, TimedRemovalTrait, Trait } from "./traits"
+import { Trait } from "./trait"
 import { vec, Vector } from "./vector"
 
-export function createFlyingBlock(
-	centerPosition: Vector,
-	direction: 1 | -1,
-	staticBlockGroup: EntityGroup,
-) {
+export function createFlyingBlock(centerPosition: Vector, direction: 1 | -1) {
 	const ent = new Entity([
 		new DrawRectTrait("green"),
 		new TimedRemovalTrait(2),
-		new DestructionTrait(direction, staticBlockGroup),
+		new DestructionTrait(direction),
 	])
 
 	ent.rect = new Rect(
@@ -23,34 +20,37 @@ export function createFlyingBlock(
 	return ent
 }
 
-class DestructionTrait implements Trait {
+class DestructionTrait extends Trait {
 	static maxFreezeTime = 0.15
 	static speed = 1000
 
 	hits = 3
 	freezeTime = 0
 
-	constructor(
-		private readonly direction: number,
-		private readonly staticBlockGroup: EntityGroup,
-	) {}
+	constructor(private readonly direction: number) {
+		super()
+	}
 
-	update(entity: Entity, dt: number) {
+	update(dt: number) {
 		if (this.freezeTime > 0) {
-			entity.velocity = vec(0, 0)
+			this.entity.velocity = vec(0, 0)
 			this.freezeTime -= dt
 		} else {
-			entity.velocity = vec(DestructionTrait.speed * this.direction, 0)
+			this.entity.velocity = vec(DestructionTrait.speed * this.direction, 0)
 
-			const hitBlock = this.staticBlockGroup.entities.find((other) =>
-				entity.rect.intersects(other.rect),
+			const hitBlock = this.world.entities.find(
+				(other) =>
+					other.has(FlyingBlockDestructionTargetTrait) &&
+					this.entity.rect.intersects(other.rect),
 			)
 
 			if (hitBlock) {
 				this.hits -= 1
-				this.hits > 0 ? hitBlock.destroy() : entity.destroy()
+				this.hits > 0 ? hitBlock.destroy() : this.entity.destroy()
 				this.freezeTime = DestructionTrait.maxFreezeTime
 			}
 		}
 	}
 }
+
+export class FlyingBlockDestructionTargetTrait extends Trait {}
