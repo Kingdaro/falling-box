@@ -3,44 +3,46 @@ import { Entity } from "./entity"
 import { context } from "./graphics"
 import { compare } from "./helpers"
 import { Rect } from "./rect"
-import { vec } from "./vector"
+import { Ref } from "./ref"
+import { vec, Vector } from "./vector"
 
 export interface Trait {
 	update?(_entity: Entity, _dt: number): void
 	draw?(_entity: Entity): void
 }
 
-export class RectTrait {
-	// TODO: simplify this by taking the args for Rect instead of a rect
-	constructor(public rect: Rect) {}
-}
-
 export class DrawRectTrait implements Trait {
-	constructor(public color = "white") {}
+	constructor(public color = "white", private readonly rect: Ref<Rect>) {}
 
-	draw(ent: Entity) {
-		const { rect } = ent.get(RectTrait)
+	draw() {
 		context.fillStyle = this.color
-		context.fillRect(...rect.valuesRounded)
+		context.fillRect(...this.rect.value.valuesRounded)
 	}
 }
 
 export class VelocityTrait implements Trait {
-	constructor(public velocity = vec(0, 0)) {}
+	constructor(
+		private readonly rect: Ref<Rect>,
+		private readonly velocity: Ref<Vector>,
+	) {}
 
 	update(ent: Entity, dt: number) {
-		const { rect } = ent.get(RectTrait)
-		rect.position = rect.position.plus(this.velocity.times(dt))
+		this.rect.value.position = this.rect.value.position.plus(
+			this.velocity.value.times(dt),
+		)
 	}
 }
 
 export class GravityTrait implements Trait {
-	constructor(public amount: number, public terminalVelocity = Infinity) {}
+	constructor(
+		private readonly amount: number,
+		private readonly terminalVelocity = Infinity,
+		private readonly velocity: Ref<Vector>,
+	) {}
 
 	update(ent: Entity, dt: number) {
-		const velocityTrait = ent.get(VelocityTrait)
-		const { velocity } = velocityTrait
-		velocityTrait.velocity = vec(
+		const velocity = this.velocity.value
+		this.velocity.value = vec(
 			velocity.x,
 			Math.min(velocity.y + this.amount * dt, this.terminalVelocity),
 		)
@@ -48,55 +50,49 @@ export class GravityTrait implements Trait {
 }
 
 export class CollisionTrait implements Trait {
-	// we have this array so that other traits can use the collision info and do stuff with it,
-	// e.g. resolve velocity, reset jumps, or something else
-	// this _may_ make the traits order-dependent in the entity,
-	// which is kind of unwieldy.
-	// it might be better to turn this into an event emitter that triggers on collisions,
-	// then add lifecycle callbacks to traits so they can listen on init, then clean up the listener
-	// maybe maybe
-	collisions: Collision[] = []
-
-	constructor(public getTargets: () => readonly Entity[]) {}
+	constructor(
+		private readonly getTargets: () => readonly Rect[],
+		private readonly rect: Ref<Rect>,
+		private readonly collisions: Ref<Collision[]>,
+	) {}
 
 	update(self: Entity) {
-		const rectTrait = self.get(RectTrait)
+		let rect = this.rect.value
 
-		const distanceToSelf = (entity: Entity) =>
-			rectTrait.rect.center.distanceTo(entity.get(RectTrait).rect.center)
+		const distanceToSelf = (otherRect: Rect) =>
+			rect.center.distanceTo(otherRect.center)
 
 		const sortedByDistance = this.getTargets()
 			.slice()
 			.sort(compare(distanceToSelf))
 
-		let newRect = rectTrait.rect
 		const collisions: Collision[] = []
 
-		for (const entity of sortedByDistance) {
-			if (entity === self) continue
+		for (const otherRect of sortedByDistance) {
+			if (otherRect === rect) continue
 
-			const { rect: otherRect } = entity.get(RectTrait)
-			const collision = checkCollision(newRect, otherRect)
+			const collision = checkCollision(rect, otherRect)
 			if (collision) {
-				newRect = newRect.withPosition(
-					newRect.position.plus(collision.displacement),
-				)
+				rect = rect.withPosition(rect.position.plus(collision.displacement))
 				collisions.push(collision)
 			}
 		}
 
-		rectTrait.rect = newRect
-		this.collisions = collisions
+		this.rect.value = rect
+		this.collisions.value = collisions
 	}
 }
 
 export class VelocityResolutionTrait implements Trait {
-	update(entity: Entity) {
-		const { collisions } = entity.get(CollisionTrait)
-		const velocityTrait = entity.get(VelocityTrait)
-		let [xvel, yvel] = velocityTrait.velocity.components()
+	constructor(
+		private readonly velocity: Ref<Vector>,
+		private readonly collisions: Ref<Collision[]>,
+	) {}
 
-		for (const { displacement } of collisions) {
+	update(entity: Entity) {
+		let [xvel, yvel] = this.velocity.value.components()
+
+		for (const { displacement } of this.collisions.value) {
 			if (
 				displacement.x !== 0 &&
 				Math.sign(displacement.x) !== Math.sign(xvel)
@@ -112,7 +108,7 @@ export class VelocityResolutionTrait implements Trait {
 			}
 		}
 
-		velocityTrait.velocity = vec(xvel, yvel)
+		this.velocity.value = vec(xvel, yvel)
 	}
 }
 

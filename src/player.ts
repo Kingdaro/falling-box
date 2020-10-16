@@ -1,3 +1,4 @@
+import { Collision } from "./collision"
 import { worldGridScale } from "./constants"
 import { Entity, EntityGroup } from "./entity"
 import { createFlyingBlock } from "./flying-block"
@@ -10,16 +11,15 @@ import {
 import { context } from "./graphics"
 import { isDown, wasPressed, wasReleased } from "./keyboard"
 import { Rect } from "./rect"
+import { Ref, ref } from "./ref"
 import {
-	CollisionTrait,
 	DrawRectTrait,
 	GravityTrait,
-	RectTrait,
 	Trait,
 	VelocityResolutionTrait,
 	VelocityTrait,
 } from "./traits"
-import { vec } from "./vector"
+import { vec, Vector } from "./vector"
 import { WorldMap } from "./world-map"
 
 const size = 40
@@ -36,60 +36,66 @@ export function createPlayer(
 	staticBlockGroup: EntityGroup,
 	flyingBlockGroup: EntityGroup,
 ) {
+	const position = vec(map.getRespawnPosition(), -respawnHeight)
+	const rect = ref(new Rect(vec(size), position))
+	const velocity = ref(vec())
+	const collisions = ref<Collision[]>([])
+
 	return new Entity([
-		new RectTrait(
-			new Rect(vec(size), vec(map.getRespawnPosition(), -respawnHeight)),
-		),
-		new MovementTrait(),
-		new JumpingTrait(),
-		new VelocityTrait(),
-		new GravityTrait(gravity),
-		new CollisionTrait(() => [...map.entities, ...staticBlockGroup.entities]),
-		new VelocityResolutionTrait(),
-		new RespawnOnFalloutTrait(map),
-		new GrabTrait(staticBlockGroup, flyingBlockGroup),
-		new DrawRectTrait(),
+		new VelocityTrait(rect, velocity),
+		new GravityTrait(gravity, Infinity, velocity),
+		// new CollisionTrait(() => [...map.entities, ...staticBlockGroup.entities]), // ???
+		new VelocityResolutionTrait(velocity, collisions),
+		new DrawRectTrait("white", rect),
+		new MovementTrait(velocity),
+		new JumpingTrait(velocity, collisions),
+		new RespawnOnFalloutTrait(map, rect, velocity),
+		new GrabTrait(staticBlockGroup, flyingBlockGroup, rect, velocity),
 	])
 }
 
 class MovementTrait implements Trait {
+	constructor(private readonly velocity: Ref<Vector>) {}
+
 	update(ent: Entity) {
-		const velocityTrait = ent.get(VelocityTrait)
-		velocityTrait.velocity = vec(
-			movementValue() * speed,
-			velocityTrait.velocity.y,
-		)
+		this.velocity.value = vec(movementValue() * speed, this.velocity.value.y)
 	}
 }
 
 class JumpingTrait implements Trait {
-	jumps = maxJumps
+	private jumps = maxJumps
+
+	constructor(
+		private readonly velocity: Ref<Vector>,
+		private readonly collisions: Ref<Collision[]>,
+	) {}
 
 	update(entity: Entity) {
-		const { collisions } = entity.get(CollisionTrait)
-		const { velocity } = entity.get(VelocityTrait)
-
-		if (collisions.some((col) => col.displacement.y < 0)) {
+		if (this.collisions.value.some((col) => col.displacement.y < 0)) {
 			this.jumps = maxJumps
 		}
 
 		if (jumpInputPressed() && this.jumps > 0) {
-			entity.get(VelocityTrait).velocity = vec(velocity.x, -jumpSpeed)
+			this.velocity.value = vec(this.velocity.value.x, -jumpSpeed)
 			this.jumps -= 1
 		}
 	}
 }
 
 class RespawnOnFalloutTrait implements Trait {
-	constructor(private readonly map: WorldMap) {}
+	constructor(
+		private readonly map: WorldMap,
+		private readonly rect: Ref<Rect>,
+		private readonly velocity: Ref<Vector>,
+	) {}
 
 	update(ent: Entity) {
-		const { rect } = ent.get(RectTrait)
-		const velTrait = ent.get(VelocityTrait)
-
-		if (rect.top > falloutDepth) {
-			rect.position = vec(this.map.getRespawnPosition(), -respawnHeight)
-			velTrait.velocity = vec()
+		if (this.rect.value.top > falloutDepth) {
+			this.rect.value.position = vec(
+				this.map.getRespawnPosition(),
+				-respawnHeight,
+			)
+			this.velocity.value = vec()
 		}
 	}
 }
@@ -101,19 +107,19 @@ class GrabTrait implements Trait {
 	constructor(
 		private readonly staticBlockGroup: EntityGroup,
 		private readonly flyingBlockGroup: EntityGroup,
+		private readonly rect: Ref<Rect>,
+		private readonly velocity: Ref<Vector>,
 	) {}
 
 	private getGrabPosition(ent: Entity) {
-		const { rect } = ent.get(RectTrait)
-		return rect.center.plus(vec(grabDistance * this.direction, 0))
+		return this.rect.value.center.plus(vec(grabDistance * this.direction, 0))
 	}
 
 	update(ent: Entity) {
-		const { velocity } = ent.get(VelocityTrait)
-		if (velocity.x > 0 && this.direction < 0) {
+		if (this.velocity.value.x > 0 && this.direction < 0) {
 			this.direction = 1
 		}
-		if (velocity.x < 0 && this.direction > 0) {
+		if (this.velocity.value.x < 0 && this.direction > 0) {
 			this.direction = -1
 		}
 
@@ -121,8 +127,9 @@ class GrabTrait implements Trait {
 
 		if (grabInputPressed() && !this.grabbing) {
 			const grabbed = this.staticBlockGroup.entities.find((ent) => {
-				const { rect } = ent.get(RectTrait)
-				return rect.containsPoint(grabPosition)
+				// ???
+				// return this.rect.value.containsPoint(grabPosition)
+				return false
 			})
 
 			if (grabbed) {
