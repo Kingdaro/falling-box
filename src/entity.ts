@@ -42,9 +42,6 @@ export class Entity {
 	draw() {
 		this.traits.forEach((t) => t.draw?.(this))
 	}
-
-	onAdded?(): void
-	onRemoved?(): void
 }
 
 export class EntityGroup<E extends Entity = Entity> extends Entity {
@@ -56,13 +53,11 @@ export class EntityGroup<E extends Entity = Entity> extends Entity {
 
 	add<TAdded extends E>(ent: TAdded): TAdded {
 		this.entitySet.add(ent)
-		ent.onAdded?.()
 		return ent
 	}
 
 	remove(ent: E) {
 		this.entitySet.delete(ent)
-		ent.onRemoved?.()
 	}
 
 	update(dt: number) {
