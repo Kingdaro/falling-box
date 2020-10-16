@@ -35,6 +35,7 @@ export function createPlayer(
 	flyingBlockGroup: EntityGroup,
 ) {
 	const ent = new Entity([
+		new PlayerTrait(),
 		new DrawRectTrait(),
 		new MovementTrait(),
 		new JumpingTrait(),
@@ -49,6 +50,8 @@ export function createPlayer(
 
 	return ent
 }
+
+export class PlayerTrait implements Trait {}
 
 class MovementTrait implements Trait {
 	update(ent: Entity) {
