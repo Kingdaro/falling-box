@@ -1,8 +1,7 @@
 import { Game } from "./game"
 import { updateGamepad } from "./gamepad"
-import { canvas, initGraphics } from "./graphics"
+import { initGraphics } from "./graphics"
 import { updateKeyboard } from "./keyboard"
-import "./styles.css"
 
 function animationFrame() {
 	return new Promise(requestAnimationFrame)
@@ -10,9 +9,6 @@ function animationFrame() {
 
 async function main() {
 	initGraphics()
-
-	const app = document.getElementById("app")!
-	app.append(canvas)
 
 	const game = new Game()
 

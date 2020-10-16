@@ -2,14 +2,13 @@
 	"name": "falling-box",
 	"private": true,
 	"scripts": {
-		"dev": "poi --serve --port 8080",
-		"build": "poi --prod",
+		"dev": "vite serve --port 8080",
+		"build": "vite build",
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
-		"@poi/plugin-typescript": "^12.3.1",
-		"poi": "^12.10.2",
 		"prettier": "^2.1.2",
-		"typescript": "^4.1.0-beta"
+		"typescript": "^4.1.0-beta",
+		"vite": "^1.0.0-rc.4"
 	}
 }
