@@ -3,7 +3,7 @@ import { Clock } from "./clock"
 import { EntityGroup } from "./entity"
 import { createFallingBlock } from "./falling-block"
 import { canvas, context } from "./graphics"
-import { createPlayer } from "./player"
+import { createPlayer, PlayerTrait } from "./player"
 import { vec } from "./vector"
 import { WorldMap } from "./world-map"
 
@@ -15,19 +15,26 @@ export class Game extends EntityGroup {
 	map = this.add(new WorldMap())
 	staticBlockGroup = this.add(new EntityGroup())
 	flyingBlockGroup = this.add(new EntityGroup())
-	player = this.add(
-		createPlayer(this.map, this.staticBlockGroup, this.flyingBlockGroup),
-	)
 	fallingBlockGroup = this.add(new EntityGroup())
 	camera = new Camera()
+
+	constructor() {
+		super()
+		this.add(
+			createPlayer(this.map, this.staticBlockGroup, this.flyingBlockGroup),
+		)
+	}
 
 	update(dt: number) {
 		super.update(dt)
 
-		this.camera.moveTowards(
-			this.player.rect.center.plus(cameraOffset),
-			dt * cameraStiffness,
-		)
+		const player = this.entities.find((e) => e.getOptional(PlayerTrait))
+		if (player) {
+			this.camera.moveTowards(
+				player.rect.center.plus(cameraOffset),
+				dt * cameraStiffness,
+			)
+		}
 
 		while (this.blockSpawnClock.advance(dt)) {
 			this.fallingBlockGroup.add(
