@@ -2,7 +2,6 @@ import { checkCollision, Collision } from "./collision"
 import { Entity } from "./entity"
 import { context } from "./graphics"
 import { compare } from "./helpers"
-import { Rect } from "./rect"
 import { vec } from "./vector"
 
 export interface Trait {
@@ -10,27 +9,12 @@ export interface Trait {
 	draw?(_entity: Entity): void
 }
 
-export class RectTrait {
-	// TODO: simplify this by taking the args for Rect instead of a rect
-	constructor(public rect: Rect) {}
-}
-
 export class DrawRectTrait implements Trait {
 	constructor(public color = "white") {}
 
 	draw(ent: Entity) {
-		const { rect } = ent.get(RectTrait)
 		context.fillStyle = this.color
-		context.fillRect(...rect.valuesRounded)
-	}
-}
-
-export class VelocityTrait implements Trait {
-	constructor(public velocity = vec(0, 0)) {}
-
-	update(ent: Entity, dt: number) {
-		const { rect } = ent.get(RectTrait)
-		rect.position = rect.position.plus(this.velocity.times(dt))
+		context.fillRect(...ent.rect.valuesRounded)
 	}
 }
 
@@ -38,11 +22,9 @@ export class GravityTrait implements Trait {
 	constructor(public amount: number, public terminalVelocity = Infinity) {}
 
 	update(ent: Entity, dt: number) {
-		const velocityTrait = ent.get(VelocityTrait)
-		const { velocity } = velocityTrait
-		velocityTrait.velocity = vec(
-			velocity.x,
-			Math.min(velocity.y + this.amount * dt, this.terminalVelocity),
+		ent.velocity = vec(
+			ent.velocity.x,
+			Math.min(ent.velocity.y + this.amount * dt, this.terminalVelocity),
 		)
 	}
 }
@@ -59,42 +41,36 @@ export class CollisionTrait implements Trait {
 
 	constructor(public getTargets: () => readonly Entity[]) {}
 
-	update(self: Entity) {
-		const rectTrait = self.get(RectTrait)
-
-		const distanceToSelf = (entity: Entity) =>
-			rectTrait.rect.center.distanceTo(entity.get(RectTrait).rect.center)
+	update(ent: Entity) {
+		const distanceToSelf = (other: Entity) =>
+			ent.rect.center.distanceTo(other.rect.center)
 
 		const sortedByDistance = this.getTargets()
 			.slice()
 			.sort(compare(distanceToSelf))
 
-		let newRect = rectTrait.rect
+		let rect = ent.rect.copy()
 		const collisions: Collision[] = []
 
-		for (const entity of sortedByDistance) {
-			if (entity === self) continue
+		for (const other of sortedByDistance) {
+			if (other === ent) continue
 
-			const { rect: otherRect } = entity.get(RectTrait)
-			const collision = checkCollision(newRect, otherRect)
+			const collision = checkCollision(rect, other.rect)
 			if (collision) {
-				newRect = newRect.withPosition(
-					newRect.position.plus(collision.displacement),
-				)
+				rect = rect.withPosition(rect.position.plus(collision.displacement))
 				collisions.push(collision)
 			}
 		}
 
-		rectTrait.rect = newRect
+		ent.rect = rect
 		this.collisions = collisions
 	}
 }
 
 export class VelocityResolutionTrait implements Trait {
-	update(entity: Entity) {
-		const { collisions } = entity.get(CollisionTrait)
-		const velocityTrait = entity.get(VelocityTrait)
-		let [xvel, yvel] = velocityTrait.velocity.components()
+	update(ent: Entity) {
+		const { collisions } = ent.get(CollisionTrait)
+		let [xvel, yvel] = ent.velocity.components()
 
 		for (const { displacement } of collisions) {
 			if (
@@ -112,17 +88,17 @@ export class VelocityResolutionTrait implements Trait {
 			}
 		}
 
-		velocityTrait.velocity = vec(xvel, yvel)
+		ent.velocity = vec(xvel, yvel)
 	}
 }
 
 export class TimedRemovalTrait implements Trait {
 	constructor(private time: number) {}
 
-	update(entity: Entity, dt: number) {
+	update(ent: Entity, dt: number) {
 		this.time -= dt
 		if (this.time < 0) {
-			entity.destroy()
+			ent.destroy()
 		}
 	}
 }

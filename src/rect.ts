@@ -1,7 +1,11 @@
 import { vec, Vector } from "./vector"
 
 export class Rect {
-	constructor(public size: Vector, public position = vec()) {}
+	constructor(public size = vec(), public position = vec()) {}
+
+	copy() {
+		return new Rect(this.size, this.position)
+	}
 
 	intersects(other: Rect) {
 		return (

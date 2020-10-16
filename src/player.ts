@@ -14,10 +14,8 @@ import {
 	CollisionTrait,
 	DrawRectTrait,
 	GravityTrait,
-	RectTrait,
 	Trait,
 	VelocityResolutionTrait,
-	VelocityTrait,
 } from "./traits"
 import { vec } from "./vector"
 import { WorldMap } from "./world-map"
@@ -36,45 +34,40 @@ export function createPlayer(
 	staticBlockGroup: EntityGroup,
 	flyingBlockGroup: EntityGroup,
 ) {
-	return new Entity([
-		new RectTrait(
-			new Rect(vec(size), vec(map.getRespawnPosition(), -respawnHeight)),
-		),
+	const ent = new Entity([
+		new DrawRectTrait(),
 		new MovementTrait(),
 		new JumpingTrait(),
-		new VelocityTrait(),
 		new GravityTrait(gravity),
 		new CollisionTrait(() => [...map.entities, ...staticBlockGroup.entities]),
 		new VelocityResolutionTrait(),
 		new RespawnOnFalloutTrait(map),
 		new GrabTrait(staticBlockGroup, flyingBlockGroup),
-		new DrawRectTrait(),
 	])
+
+	ent.rect = new Rect(vec(size), vec(map.getRespawnPosition(), -respawnHeight))
+
+	return ent
 }
 
 class MovementTrait implements Trait {
 	update(ent: Entity) {
-		const velocityTrait = ent.get(VelocityTrait)
-		velocityTrait.velocity = vec(
-			movementValue() * speed,
-			velocityTrait.velocity.y,
-		)
+		ent.velocity = vec(movementValue() * speed, ent.velocity.y)
 	}
 }
 
 class JumpingTrait implements Trait {
 	jumps = maxJumps
 
-	update(entity: Entity) {
-		const { collisions } = entity.get(CollisionTrait)
-		const { velocity } = entity.get(VelocityTrait)
+	update(ent: Entity) {
+		const { collisions } = ent.get(CollisionTrait)
 
 		if (collisions.some((col) => col.displacement.y < 0)) {
 			this.jumps = maxJumps
 		}
 
 		if (jumpInputPressed() && this.jumps > 0) {
-			entity.get(VelocityTrait).velocity = vec(velocity.x, -jumpSpeed)
+			ent.velocity = vec(ent.velocity.x, -jumpSpeed)
 			this.jumps -= 1
 		}
 	}
@@ -84,12 +77,9 @@ class RespawnOnFalloutTrait implements Trait {
 	constructor(private readonly map: WorldMap) {}
 
 	update(ent: Entity) {
-		const { rect } = ent.get(RectTrait)
-		const velTrait = ent.get(VelocityTrait)
-
-		if (rect.top > falloutDepth) {
-			rect.position = vec(this.map.getRespawnPosition(), -respawnHeight)
-			velTrait.velocity = vec()
+		if (ent.rect.top > falloutDepth) {
+			ent.rect.position = vec(this.map.getRespawnPosition(), -respawnHeight)
+			ent.velocity = vec()
 		}
 	}
 }
@@ -104,16 +94,14 @@ class GrabTrait implements Trait {
 	) {}
 
 	private getGrabPosition(ent: Entity) {
-		const { rect } = ent.get(RectTrait)
-		return rect.center.plus(vec(grabDistance * this.direction, 0))
+		return ent.rect.center.plus(vec(grabDistance * this.direction, 0))
 	}
 
 	update(ent: Entity) {
-		const { velocity } = ent.get(VelocityTrait)
-		if (velocity.x > 0 && this.direction < 0) {
+		if (ent.velocity.x > 0 && this.direction < 0) {
 			this.direction = 1
 		}
-		if (velocity.x < 0 && this.direction > 0) {
+		if (ent.velocity.x < 0 && this.direction > 0) {
 			this.direction = -1
 		}
 
@@ -121,7 +109,7 @@ class GrabTrait implements Trait {
 
 		if (grabInputPressed() && !this.grabbing) {
 			const grabbed = this.staticBlockGroup.entities.find((ent) => {
-				const { rect } = ent.get(RectTrait)
+				const { rect } = ent
 				return rect.containsPoint(grabPosition)
 			})
 

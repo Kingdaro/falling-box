@@ -1,9 +1,14 @@
 import { raise } from "./helpers"
+import { Rect } from "./rect"
 import { Trait } from "./traits"
+import { vec } from "./vector"
 
 export class Entity {
+	rect = new Rect()
+	velocity = vec()
+	isMarkedForRemoval = false
+
 	private traits = new Map<Function, Trait>()
-	shouldDestroy = false
 
 	constructor(traits: object[] = []) {
 		for (const trait of traits) {
@@ -26,10 +31,11 @@ export class Entity {
 	}
 
 	destroy() {
-		this.shouldDestroy = true
+		this.isMarkedForRemoval = true
 	}
 
 	update(dt: number) {
+		this.rect.position = this.rect.position.plus(this.velocity.times(dt))
 		this.traits.forEach((t) => t.update?.(this, dt))
 	}
 
@@ -60,20 +66,16 @@ export class EntityGroup<E extends Entity = Entity> extends Entity {
 	}
 
 	update(dt: number) {
-		for (const ent of this.entitySet) {
-			ent.update(dt)
-		}
+		this.entitySet.forEach((e) => e.update(dt))
 
-		for (const ent of this.entitySet) {
-			if (ent.shouldDestroy) {
-				this.remove(ent)
-			}
-		}
+		const removedEntities = [...this.entitySet].filter(
+			(e) => e.isMarkedForRemoval,
+		)
+
+		removedEntities.forEach((e) => this.entitySet.delete(e))
 	}
 
 	draw() {
-		for (const ent of this.entitySet) {
-			ent.draw()
-		}
+		this.entitySet.forEach((ent) => ent.draw())
 	}
 }

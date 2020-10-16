@@ -1,13 +1,7 @@
 import { worldGridScale } from "./constants"
 import { Entity, EntityGroup } from "./entity"
 import { Rect } from "./rect"
-import {
-	DrawRectTrait,
-	RectTrait,
-	TimedRemovalTrait,
-	Trait,
-	VelocityTrait,
-} from "./traits"
+import { DrawRectTrait, TimedRemovalTrait, Trait } from "./traits"
 import { vec, Vector } from "./vector"
 
 export function createFlyingBlock(
@@ -15,15 +9,18 @@ export function createFlyingBlock(
 	direction: 1 | -1,
 	staticBlockGroup: EntityGroup,
 ) {
-	return new Entity([
-		new RectTrait(
-			new Rect(vec(worldGridScale), centerPosition.minus(worldGridScale / 2)),
-		),
+	const ent = new Entity([
 		new DrawRectTrait("green"),
-		new VelocityTrait(),
 		new TimedRemovalTrait(2),
 		new DestructionTrait(direction, staticBlockGroup),
 	])
+
+	ent.rect = new Rect(
+		vec(worldGridScale),
+		centerPosition.minus(worldGridScale / 2),
+	)
+
+	return ent
 }
 
 class DestructionTrait implements Trait {
@@ -39,16 +36,14 @@ class DestructionTrait implements Trait {
 	) {}
 
 	update(entity: Entity, dt: number) {
-		const { rect } = entity.get(RectTrait)
-		const velocityTrait = entity.get(VelocityTrait)
-
 		if (this.freezeTime > 0) {
-			velocityTrait.velocity = vec(0, 0)
+			entity.velocity = vec(0, 0)
 			this.freezeTime -= dt
 		} else {
-			velocityTrait.velocity = vec(DestructionTrait.speed * this.direction, 0)
-			const hitBlock = this.staticBlockGroup.entities.find((ent) =>
-				ent.get(RectTrait).rect.intersects(rect),
+			entity.velocity = vec(DestructionTrait.speed * this.direction, 0)
+
+			const hitBlock = this.staticBlockGroup.entities.find((other) =>
+				entity.rect.intersects(other.rect),
 			)
 
 			if (hitBlock) {

@@ -4,7 +4,6 @@ import { EntityGroup } from "./entity"
 import { createFallingBlock } from "./falling-block"
 import { canvas, context } from "./graphics"
 import { createPlayer } from "./player"
-import { RectTrait } from "./traits"
 import { vec } from "./vector"
 import { WorldMap } from "./world-map"
 
@@ -26,7 +25,7 @@ export class Game extends EntityGroup {
 		super.update(dt)
 
 		this.camera.moveTowards(
-			this.player.get(RectTrait).rect.center.plus(cameraOffset),
+			this.player.rect.center.plus(cameraOffset),
 			dt * cameraStiffness,
 		)
 
