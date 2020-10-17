@@ -33,13 +33,6 @@ export class GravityTrait extends Trait {
 }
 
 export class CollisionTrait extends Trait {
-	// we have this array so that other traits can use the collision info and do stuff with it,
-	// e.g. resolve velocity, reset jumps, or something else
-	// this _may_ make the traits order-dependent in the entity,
-	// which is kind of unwieldy.
-	// it might be better to turn this into an event emitter that triggers on collisions,
-	// then add lifecycle callbacks to traits so they can listen on init, then clean up the listener
-	// maybe maybe
 	collisions: Collision[] = []
 
 	constructor(private readonly shouldCollide: (entity: Entity) => boolean) {
