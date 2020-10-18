@@ -1,4 +1,4 @@
-import { DrawRectTrait, TimedRemovalTrait } from "./common-traits"
+import { DrawRectTrait, TimerTrait } from "./common-traits"
 import { worldGridScale } from "./constants"
 import { Entity } from "./entity"
 import { Rect } from "./rect"
@@ -8,7 +8,7 @@ import { vec, Vector } from "./vector"
 export function createFlyingBlock(centerPosition: Vector, direction: 1 | -1) {
 	const ent = new Entity([
 		new DrawRectTrait("green"),
-		new TimedRemovalTrait(2),
+		new TimerTrait(2, (ent) => ent.destroy()),
 		new DestructionTrait(direction),
 	])
 

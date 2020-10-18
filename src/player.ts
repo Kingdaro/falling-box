@@ -1,9 +1,4 @@
-import {
-	CollisionTrait,
-	DrawRectTrait,
-	GravityTrait,
-	VelocityResolutionTrait,
-} from "./common-traits"
+import { DrawRectTrait, GravityTrait, TimerTrait } from "./common-traits"
 import { worldGridScale } from "./constants"
 import { Entity } from "./entity"
 import { createFlyingBlock } from "./flying-block"
@@ -18,6 +13,7 @@ import { isDown, wasPressed, wasReleased } from "./keyboard"
 import { Rect } from "./rect"
 import { Trait } from "./trait"
 import { vec } from "./vector"
+import { Collision } from "./world"
 import { WorldMap } from "./world-map"
 
 const size = 40
@@ -36,7 +32,7 @@ export function createPlayer(map: WorldMap) {
 		new MovementTrait(),
 		new JumpingTrait(),
 		new GravityTrait(gravity),
-		new CollisionTrait((ent) => ent.has(PlayerCollisionTargetTrait)),
+		new PlayerPhysicsTrait(),
 		new VelocityResolutionTrait(),
 		new RespawnOnFalloutTrait(map),
 		new GrabTrait(),
@@ -47,9 +43,56 @@ export function createPlayer(map: WorldMap) {
 	return ent
 }
 
+export function createPlayerSpawner(map: WorldMap) {
+	const ent = new Entity([
+		new TimerTrait(2, (ent) => {
+			ent.world.add(createPlayer(map))
+			ent.destroy()
+		}),
+	])
+	return ent
+}
+
 export class PlayerTrait extends Trait {}
 
 export class PlayerCollisionTargetTrait extends Trait {}
+
+class PlayerPhysicsTrait extends Trait {
+	collisions: Collision[] = []
+
+	update() {
+		const { collisions, rect } = this.world.findCollisions(this.entity, (ent) =>
+			ent.has(PlayerCollisionTargetTrait),
+		)
+		this.collisions = collisions
+		this.entity.rect = rect
+	}
+}
+
+class VelocityResolutionTrait extends Trait {
+	update() {
+		const { collisions } = this.entity.get(PlayerPhysicsTrait)
+		let [xvel, yvel] = this.entity.velocity.components()
+
+		for (const { displacement } of collisions) {
+			if (
+				displacement.x !== 0 &&
+				Math.sign(displacement.x) !== Math.sign(xvel)
+			) {
+				xvel = 0
+			}
+
+			if (
+				displacement.y !== 0 &&
+				Math.sign(displacement.y) !== Math.sign(yvel)
+			) {
+				yvel = 0
+			}
+		}
+
+		this.entity.velocity = vec(xvel, yvel)
+	}
+}
 
 class MovementTrait extends Trait {
 	update() {
@@ -61,7 +104,7 @@ class JumpingTrait extends Trait {
 	jumps = maxJumps
 
 	update() {
-		const { collisions } = this.entity.get(CollisionTrait)
+		const { collisions } = this.entity.get(PlayerPhysicsTrait)
 
 		if (collisions.some((col) => col.displacement.y < 0)) {
 			this.jumps = maxJumps

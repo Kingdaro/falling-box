@@ -1,8 +1,8 @@
-import { CollisionTrait, DrawRectTrait, GravityTrait } from "./common-traits"
+import { DrawRectTrait, GravityTrait } from "./common-traits"
 import { worldGridScale } from "./constants"
 import { Entity } from "./entity"
 import { FlyingBlockDestructionTargetTrait } from "./flying-block"
-import { GrabTargetTrait } from "./player"
+import { createPlayerSpawner, GrabTargetTrait, PlayerTrait } from "./player"
 import { Rect } from "./rect"
 import { createStaticBlock } from "./static-block"
 import { Trait } from "./trait"
@@ -17,10 +17,10 @@ export function createFallingBlock(map: WorldMap) {
 	const ent = new Entity([
 		new DrawRectTrait(),
 		new GravityTrait(gravity, terminalVelocity),
-		new CollisionTrait((entity) => entity.has(FallingBlockFloorTrait)),
 		new BecomeStaticTrait(),
 		new GrabTargetTrait(),
 		new FlyingBlockDestructionTargetTrait(),
+		new SquishTrait(map),
 	])
 
 	ent.rect = new Rect(
@@ -31,14 +31,41 @@ export function createFallingBlock(map: WorldMap) {
 	return ent
 }
 
+export class FallingBlockFloorTrait extends Trait {}
+
 class BecomeStaticTrait extends Trait {
 	update() {
-		const { collisions } = this.entity.get(CollisionTrait)
+		const { rect, collisions } = this.world.findCollisions(this.entity, (ent) =>
+			ent.has(FallingBlockFloorTrait),
+		)
+
 		if (collisions.some((col) => col.displacement.y < 0)) {
 			this.entity.destroy()
-			this.world.add(createStaticBlock(this.entity.rect.position))
+			this.world.add(createStaticBlock(rect.position))
 		}
 	}
 }
 
-export class FallingBlockFloorTrait extends Trait {}
+class SquishTrait extends Trait {
+	constructor(private readonly map: WorldMap) {
+		super()
+	}
+
+	update() {
+		const targets = this.world.entities.filter((ent) => ent.has(PlayerTrait))
+		const { rect } = this.entity
+		for (const target of targets) {
+			const isIntersecting = rect.intersects(target.rect)
+
+			const isInside =
+				Math.abs(target.rect.center.x - rect.center.x) < rect.width / 2
+
+			const isBelow = target.rect.center.y > rect.center.y
+
+			if (isIntersecting && isInside && isBelow) {
+				target.destroy()
+				this.world.add(createPlayerSpawner(this.map))
+			}
+		}
+	}
+}

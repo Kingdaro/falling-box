@@ -1,4 +1,4 @@
-import { DrawRectTrait, TimedRemovalTrait } from "./common-traits"
+import { DrawRectTrait, TimerTrait } from "./common-traits"
 import { worldGridScale } from "./constants"
 import { Entity } from "./entity"
 import { FallingBlockFloorTrait } from "./falling-block"
@@ -10,7 +10,7 @@ import { vec, Vector } from "./vector"
 export function createStaticBlock(position: Vector) {
 	const ent = new Entity([
 		new DrawRectTrait(),
-		new TimedRemovalTrait(15),
+		new TimerTrait(15, (ent) => ent.destroy()),
 		new FlyingBlockDestructionTargetTrait(),
 		new FallingBlockFloorTrait(),
 		new PlayerCollisionTargetTrait(),
