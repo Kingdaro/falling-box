@@ -4,7 +4,7 @@ import { Entity } from "./entity"
 import { FlyingBlockDestructionTargetTrait } from "./flying-block"
 import { GrabTargetTrait, PlayerCollisionTargetTrait } from "./player"
 import { Rect } from "./rect"
-import { createStaticBlock } from "./static-block"
+import { StaticBlock } from "./static-block"
 import { Trait } from "./trait"
 import { vec } from "./vector"
 import { WorldMap } from "./world-map"
@@ -42,7 +42,7 @@ class BecomeStaticTrait extends Trait {
 
 		if (collisions.some((col) => col.displacement.y < 0)) {
 			this.entity.destroy()
-			this.world.add(createStaticBlock(finalRect.position))
+			this.world.add(new StaticBlock(finalRect.position))
 		}
 	}
 }

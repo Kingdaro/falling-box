@@ -2,7 +2,7 @@ import { DrawRectTrait, GravityTrait, TimerTrait } from "./common-traits"
 import { worldGridScale } from "./constants"
 import { Entity } from "./entity"
 import { FallingBlock } from "./falling-block"
-import { createFlyingBlock } from "./flying-block"
+import { FlyingBlock } from "./flying-block"
 import {
 	getAxis,
 	isButtonDown,
@@ -26,33 +26,37 @@ const falloutDepth = 1000
 const respawnHeight = 500
 const grabDistance = 50
 
-export function createPlayer(map: WorldMap) {
-	const ent = new Entity([
-		new PlayerTrait(),
-		new DrawRectTrait(),
-		new MovementTrait(),
-		new JumpingTrait(),
-		new GravityTrait(gravity),
-		new PlayerPhysicsTrait(),
-		new VelocityResolutionTrait(),
-		new RespawnOnFalloutTrait(map),
-		new GrabTrait(),
-		new SquishTrait(map),
-	])
+export class Player extends Entity {
+	constructor(map: WorldMap) {
+		super([
+			new PlayerTrait(),
+			new DrawRectTrait(),
+			new MovementTrait(),
+			new JumpingTrait(),
+			new GravityTrait(gravity),
+			new PlayerPhysicsTrait(),
+			new VelocityResolutionTrait(),
+			new RespawnOnFalloutTrait(map),
+			new GrabTrait(),
+			new SquishTrait(map),
+		])
 
-	ent.rect = new Rect(vec(size), vec(map.getRespawnPosition(), -respawnHeight))
-
-	return ent
+		this.rect = new Rect(
+			vec(size),
+			vec(map.getRespawnPosition(), -respawnHeight),
+		)
+	}
 }
 
-export function createPlayerSpawner(map: WorldMap) {
-	const ent = new Entity([
-		new TimerTrait(2, (ent) => {
-			ent.world.add(createPlayer(map))
-			ent.destroy()
-		}),
-	])
-	return ent
+class PlayerSpawner extends Entity {
+	constructor(map: WorldMap) {
+		super([
+			new TimerTrait(2, (ent) => {
+				ent.world.add(new Player(map))
+				ent.destroy()
+			}),
+		])
+	}
 }
 
 export class PlayerTrait extends Trait {}
@@ -167,7 +171,7 @@ class GrabTrait extends Trait {
 
 		if (grabInputReleased() && this.grabbing) {
 			this.grabbing = false
-			this.world.add(createFlyingBlock(grabPosition, this.direction))
+			this.world.add(new FlyingBlock(grabPosition, this.direction))
 		}
 	}
 
@@ -228,7 +232,7 @@ class SquishTrait extends Trait {
 
 			if (isIntersecting && isInside && isBelow && isOnGround) {
 				this.entity.destroy()
-				this.world.add(createPlayerSpawner(this.map))
+				this.world.add(new PlayerSpawner(this.map))
 			}
 		}
 	}

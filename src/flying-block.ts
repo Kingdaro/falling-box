@@ -5,19 +5,18 @@ import { Rect } from "./rect"
 import { Trait } from "./trait"
 import { vec, Vector } from "./vector"
 
-export function createFlyingBlock(centerPosition: Vector, direction: 1 | -1) {
-	const ent = new Entity([
-		new DrawRectTrait("green"),
-		new TimerTrait(2, (ent) => ent.destroy()),
-		new DestructionTrait(direction),
-	])
-
-	ent.rect = new Rect(
-		vec(worldGridScale),
-		centerPosition.minus(worldGridScale / 2),
-	)
-
-	return ent
+export class FlyingBlock extends Entity {
+	constructor(centerPosition: Vector, direction: 1 | -1) {
+		super([
+			new DrawRectTrait("green"),
+			new TimerTrait(2, (ent) => ent.destroy()),
+			new DestructionTrait(direction),
+		])
+		this.rect = new Rect(
+			vec(worldGridScale),
+			centerPosition.minus(worldGridScale / 2),
+		)
+	}
 }
 
 class DestructionTrait extends Trait {

@@ -45,16 +45,3 @@ export class TimerTrait extends Trait {
 		}
 	}
 }
-
-export class TimedRemovalTrait extends Trait {
-	constructor(private time: number) {
-		super()
-	}
-
-	update(dt: number) {
-		this.time -= dt
-		if (this.time < 0) {
-			this.entity.destroy()
-		}
-	}
-}
