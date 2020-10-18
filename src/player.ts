@@ -1,6 +1,7 @@
 import { DrawRectTrait, GravityTrait, TimerTrait } from "./common-traits"
 import { worldGridScale } from "./constants"
 import { Entity } from "./entity"
+import { FallingBlock } from "./falling-block"
 import { createFlyingBlock } from "./flying-block"
 import {
 	getAxis,
@@ -36,6 +37,7 @@ export function createPlayer(map: WorldMap) {
 		new VelocityResolutionTrait(),
 		new RespawnOnFalloutTrait(map),
 		new GrabTrait(),
+		new SquishTrait(map),
 	])
 
 	ent.rect = new Rect(vec(size), vec(map.getRespawnPosition(), -respawnHeight))
@@ -59,6 +61,10 @@ export class PlayerCollisionTargetTrait extends Trait {}
 
 class PlayerPhysicsTrait extends Trait {
 	collisions: Collision[] = []
+
+	get isOnGround() {
+		return this.collisions.some((col) => col.displacement.y < 0)
+	}
 
 	update() {
 		const { collisions, rect } = this.world.findCollisions(this.entity, (ent) =>
@@ -104,9 +110,9 @@ class JumpingTrait extends Trait {
 	jumps = maxJumps
 
 	update() {
-		const { collisions } = this.entity.get(PlayerPhysicsTrait)
+		const { isOnGround } = this.entity.get(PlayerPhysicsTrait)
 
-		if (collisions.some((col) => col.displacement.y < 0)) {
+		if (isOnGround) {
 			this.jumps = maxJumps
 		}
 
@@ -197,6 +203,35 @@ class GrabTrait extends Trait {
 }
 
 export class GrabTargetTrait extends Trait {}
+
+class SquishTrait extends Trait {
+	constructor(private readonly map: WorldMap) {
+		super()
+	}
+
+	update() {
+		const { rect } = this.entity
+		const { isOnGround } = this.entity.get(PlayerPhysicsTrait)
+
+		const blocks = this.world.entities.filter(
+			(ent) => ent instanceof FallingBlock,
+		)
+
+		for (const block of blocks) {
+			const isIntersecting = rect.intersects(block.rect)
+
+			const isInside =
+				Math.abs(block.rect.center.x - rect.center.x) < rect.width / 2
+
+			const isBelow = rect.top > block.rect.center.y
+
+			if (isIntersecting && isInside && isBelow && isOnGround) {
+				this.entity.destroy()
+				this.world.add(createPlayerSpawner(this.map))
+			}
+		}
+	}
+}
 
 const movementValue = () => {
 	const axis = getAxis("leftX")

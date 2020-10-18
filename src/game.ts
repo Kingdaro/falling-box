@@ -1,6 +1,6 @@
 import { Camera } from "./camera"
 import { Clock } from "./clock"
-import { createFallingBlock } from "./falling-block"
+import { FallingBlock } from "./falling-block"
 import { canvas, context } from "./graphics"
 import { createPlayer, PlayerTrait } from "./player"
 import { vec } from "./vector"
@@ -32,7 +32,7 @@ export class Game {
 		}
 
 		while (this.blockSpawnClock.advance(dt)) {
-			this.world.add(createFallingBlock(this.map))
+			this.world.add(new FallingBlock(this.map))
 		}
 	}
 
