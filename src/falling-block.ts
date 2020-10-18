@@ -35,13 +35,14 @@ export class FallingBlockFloorTrait extends Trait {}
 
 class BecomeStaticTrait extends Trait {
 	update() {
-		const { rect, collisions } = this.world.findCollisions(this.entity, (ent) =>
-			ent.has(FallingBlockFloorTrait),
+		const { finalRect, collisions } = this.world.findCollisions(
+			this.entity,
+			(ent) => ent.has(FallingBlockFloorTrait),
 		)
 
 		if (collisions.some((col) => col.displacement.y < 0)) {
 			this.entity.destroy()
-			this.world.add(createStaticBlock(rect.position))
+			this.world.add(createStaticBlock(finalRect.position))
 		}
 	}
 }

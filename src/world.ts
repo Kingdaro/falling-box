@@ -60,7 +60,7 @@ export class World {
 			}
 		}
 
-		return { collisions, rect }
+		return { collisions, finalRect: rect }
 	}
 }
 

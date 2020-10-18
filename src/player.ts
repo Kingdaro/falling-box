@@ -67,11 +67,12 @@ class PlayerPhysicsTrait extends Trait {
 	}
 
 	update() {
-		const { collisions, rect } = this.world.findCollisions(this.entity, (ent) =>
-			ent.has(PlayerCollisionTargetTrait),
-		)
-		this.collisions = collisions
-		this.entity.rect = rect
+		const result = this.world.findCollisions(this.entity, (ent) => {
+			return ent.has(PlayerCollisionTargetTrait)
+		})
+
+		this.collisions = result.collisions
+		this.entity.rect = result.finalRect
 	}
 }
 
@@ -80,19 +81,19 @@ class VelocityResolutionTrait extends Trait {
 		const { collisions } = this.entity.get(PlayerPhysicsTrait)
 		let [xvel, yvel] = this.entity.velocity.components()
 
-		for (const { displacement } of collisions) {
+		for (const { displacement, entity } of collisions) {
 			if (
 				displacement.x !== 0 &&
 				Math.sign(displacement.x) !== Math.sign(xvel)
 			) {
-				xvel = 0
+				xvel = entity.velocity.x
 			}
 
 			if (
 				displacement.y !== 0 &&
 				Math.sign(displacement.y) !== Math.sign(yvel)
 			) {
-				yvel = 0
+				yvel = entity.velocity.y
 			}
 		}
 
