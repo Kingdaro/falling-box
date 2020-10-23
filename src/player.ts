@@ -26,7 +26,7 @@ const respawnHeight = 500
 const grabDistance = 50
 
 export class Player extends Entity {
-	constructor(map: WorldMap, controller?: HumanControllerTrait) {
+	constructor(map: WorldMap, controller: Trait) {
 		const traits = [
 			new DrawRectTrait(),
 			new MovementTrait(),
@@ -37,11 +37,8 @@ export class Player extends Entity {
 			new RespawnOnFalloutTrait(map),
 			new GrabTrait(),
 			new SquishTrait(map),
+			controller,
 		]
-
-		if (controller) {
-			traits.push(controller)
-		}
 
 		super(traits)
 
@@ -55,10 +52,10 @@ export class Player extends Entity {
 export class PlayerPhysicsTargetTrait extends Trait {}
 
 class PlayerSpawner extends Entity {
-	constructor(map: WorldMap) {
+	constructor(map: WorldMap, controller: Trait) {
 		super([
 			new TimerTrait(2, (ent) => {
-				ent.world.add(new Player(map))
+				ent.world.add(new Player(map, controller))
 				ent.destroy()
 			}),
 		])
@@ -243,7 +240,9 @@ class SquishTrait extends Trait {
 
 			if (isIntersecting && isInside && isBelow && isOnGround) {
 				this.entity.destroy()
-				this.world.add(new PlayerSpawner(this.map))
+				this.world.add(
+					new PlayerSpawner(this.map, this.entity.get(HumanControllerTrait)),
+				)
 			}
 		}
 	}
