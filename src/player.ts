@@ -292,27 +292,3 @@ export class HumanControllerTrait extends Trait {
 		if (grabInput.wasReleased) grabbing.release()
 	}
 }
-
-/* 
-const movementValue = () => {
-	const axis = getAxis("leftX")
-	if (axis !== 0) return axis
-
-	let value = 0
-	if (isButtonDown("dpadLeft") || ["ArrowLeft", "KeyA"].some(isDown)) {
-		value -= 1
-	}
-	if (isButtonDown("dpadRight") || ["ArrowRight", "KeyR"].some(isDown)) {
-		value += 1
-	}
-	return value
-}
-
-const jumpInputPressed = () => wasButtonPressed("a") || wasPressed("ArrowUp")
-
-const grabInputPressed = () =>
-	wasPressed("KeyZ") || wasButtonPressed("x") || wasButtonPressed("b")
-
-const grabInputReleased = () =>
-	wasReleased("KeyZ") || wasButtonReleased("x") || wasButtonReleased("b")
- */
