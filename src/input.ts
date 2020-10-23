@@ -12,7 +12,7 @@ export type InputState = {
 export abstract class Input {
 	private state?: InputState
 
-	protected abstract getCurrentValue(): number
+	abstract getCurrentValue(): number
 
 	nextState(): InputState {
 		const value = this.getCurrentValue()
@@ -34,6 +34,10 @@ export abstract class Input {
 
 		return (this.state = newState)
 	}
+
+	static combined(...inputs: Input[]): CombinedInput {
+		return new CombinedInput(inputs)
+	}
 }
 
 export class KeyboardInput extends Input {
@@ -41,7 +45,7 @@ export class KeyboardInput extends Input {
 		super()
 	}
 
-	protected getCurrentValue() {
+	getCurrentValue() {
 		return keyboard.isDown(this.key) ? 1 : 0
 	}
 }
@@ -51,7 +55,7 @@ export class GamepadButtonInput extends Input {
 		super()
 	}
 
-	protected getCurrentValue() {
+	getCurrentValue() {
 		return gamepad.getButtonValue(this.button)
 	}
 }
@@ -72,7 +76,21 @@ export class GamepadAxisInput extends Input {
 		return new GamepadAxisInput(axis, (value) => Math.abs(clamp(value, -1, 0)))
 	}
 
-	protected getCurrentValue() {
+	getCurrentValue() {
 		return this.filter(gamepad.getAxis(this.axis))
+	}
+}
+
+export class CombinedInput extends Input {
+	constructor(private readonly inputs: Input[]) {
+		super()
+	}
+
+	getCurrentValue() {
+		for (const input of this.inputs) {
+			const value = input.getCurrentValue()
+			if (value !== 0) return value
+		}
+		return 0
 	}
 }
