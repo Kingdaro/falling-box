@@ -3,14 +3,8 @@ import { worldGridScale } from "./constants"
 import { Entity } from "./entity"
 import { FallingBlock } from "./falling-block"
 import { FlyingBlock } from "./flying-block"
-import {
-	getAxis,
-	isButtonDown,
-	wasButtonPressed,
-	wasButtonReleased,
-} from "./gamepad"
 import { context } from "./graphics"
-import { isDown, wasPressed, wasReleased } from "./keyboard"
+import { GamepadAxisInput, GamepadButtonInput } from "./input"
 import { Rect } from "./rect"
 import { Trait } from "./trait"
 import { vec } from "./vector"
@@ -27,8 +21,8 @@ const respawnHeight = 500
 const grabDistance = 50
 
 export class Player extends Entity {
-	constructor(map: WorldMap) {
-		super([
+	constructor(map: WorldMap, controller?: HumanControllerTrait) {
+		const traits = [
 			new DrawRectTrait(),
 			new MovementTrait(),
 			new JumpingTrait(),
@@ -38,7 +32,13 @@ export class Player extends Entity {
 			new RespawnOnFalloutTrait(map),
 			new GrabTrait(),
 			new SquishTrait(map),
-		])
+		]
+
+		if (controller) {
+			traits.push(controller)
+		}
+
+		super(traits)
 
 		this.rect = new Rect(
 			vec(size),
@@ -103,8 +103,9 @@ class VelocityResolutionTrait extends Trait {
 }
 
 class MovementTrait extends Trait {
+	movement = 0
 	update() {
-		this.entity.velocity = vec(movementValue() * speed, this.entity.velocity.y)
+		this.entity.velocity = vec(this.movement * speed, this.entity.velocity.y)
 	}
 }
 
@@ -113,36 +114,24 @@ class JumpingTrait extends Trait {
 
 	update() {
 		const { isOnGround } = this.entity.get(PlayerPhysicsTrait)
-
 		if (isOnGround) {
 			this.jumps = maxJumps
 		}
+	}
 
-		if (jumpInputPressed() && this.jumps > 0) {
+	jump() {
+		if (this.jumps > 0) {
 			this.entity.velocity = vec(this.entity.velocity.x, -jumpSpeed)
 			this.jumps -= 1
 		}
 	}
 }
 
-class RespawnOnFalloutTrait extends Trait {
-	constructor(private readonly map: WorldMap) {
-		super()
-	}
-
-	update() {
-		if (this.entity.rect.top > falloutDepth) {
-			this.entity.rect.position = vec(
-				this.map.getRespawnPosition(),
-				-respawnHeight,
-			)
-			this.entity.velocity = vec()
-		}
-	}
-}
-
 class GrabTrait extends Trait {
+	// consider splitting this value out into a DirectionTrait or a FacingTrait
+	// if this becomes relevant for more than grabbing
 	private direction: 1 | -1 = 1
+
 	private grabbing = false
 
 	update() {
@@ -152,10 +141,11 @@ class GrabTrait extends Trait {
 		if (this.entity.velocity.x < 0 && this.direction > 0) {
 			this.direction = -1
 		}
+	}
 
+	grab() {
 		const grabPosition = this.getGrabPosition()
-
-		if (grabInputPressed() && !this.grabbing) {
+		if (!this.grabbing) {
 			const grabbed = this.world.entities.find((ent) => {
 				return ent.has(GrabTargetTrait) && ent.rect.containsPoint(grabPosition)
 			})
@@ -165,8 +155,11 @@ class GrabTrait extends Trait {
 				this.grabbing = true
 			}
 		}
+	}
 
-		if (grabInputReleased() && this.grabbing) {
+	release() {
+		const grabPosition = this.getGrabPosition()
+		if (this.grabbing) {
 			this.grabbing = false
 			this.world.add(new FlyingBlock(grabPosition, this.direction))
 		}
@@ -206,6 +199,22 @@ class GrabTrait extends Trait {
 
 export class GrabTargetTrait extends Trait {}
 
+class RespawnOnFalloutTrait extends Trait {
+	constructor(private readonly map: WorldMap) {
+		super()
+	}
+
+	update() {
+		if (this.entity.rect.top > falloutDepth) {
+			this.entity.rect.position = vec(
+				this.map.getRespawnPosition(),
+				-respawnHeight,
+			)
+			this.entity.velocity = vec()
+		}
+	}
+}
+
 class SquishTrait extends Trait {
 	constructor(private readonly map: WorldMap) {
 		super()
@@ -235,6 +244,33 @@ class SquishTrait extends Trait {
 	}
 }
 
+export class HumanControllerTrait extends Trait {
+	private readonly left = GamepadAxisInput.negative("leftX")
+	private readonly right = GamepadAxisInput.positive("leftX")
+	private readonly jump = new GamepadButtonInput("a")
+	private readonly grab = new GamepadButtonInput("x")
+
+	update() {
+		const leftInput = this.left.nextState()
+		const rightInput = this.right.nextState()
+		const jumpInput = this.jump.nextState()
+		const grabInput = this.grab.nextState()
+
+		const movement = this.entity.get(MovementTrait)
+		movement.movement = rightInput.value - leftInput.value
+
+		const jumping = this.entity.get(JumpingTrait)
+		if (jumpInput.wasPressed) {
+			jumping.jump()
+		}
+
+		const grabbing = this.entity.get(GrabTrait)
+		if (grabInput.wasPressed) grabbing.grab()
+		if (grabInput.wasReleased) grabbing.release()
+	}
+}
+
+/* 
 const movementValue = () => {
 	const axis = getAxis("leftX")
 	if (axis !== 0) return axis
@@ -256,3 +292,4 @@ const grabInputPressed = () =>
 
 const grabInputReleased = () =>
 	wasReleased("KeyZ") || wasButtonReleased("x") || wasButtonReleased("b")
+ */

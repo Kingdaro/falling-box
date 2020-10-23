@@ -16,7 +16,7 @@ const buttonNameMap = {
 	dpadLeft: 14,
 	dpadRight: 15,
 }
-type ButtonName = keyof typeof buttonNameMap
+export type ButtonName = keyof typeof buttonNameMap
 
 const axisNameMap = {
 	leftX: 0,
@@ -24,7 +24,7 @@ const axisNameMap = {
 	rightX: 2,
 	rightY: 3,
 }
-type AxisName = keyof typeof axisNameMap
+export type AxisName = keyof typeof axisNameMap
 
 type ButtonState = "justPressed" | "pressed" | "justReleased" | "released"
 const buttonStates = new Map<number, ButtonState>()
@@ -70,6 +70,10 @@ export function updateGamepad() {
 export function isButtonDown(name: ButtonName) {
 	const state = buttonStates.get(buttonNameMap[name])
 	return state === "justPressed" || state === "pressed"
+}
+
+export function getButtonValue(name: ButtonName) {
+	return buttonValues.get(buttonNameMap[name]) ?? 0
 }
 
 export function wasButtonPressed(name: ButtonName) {

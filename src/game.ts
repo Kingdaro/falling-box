@@ -2,7 +2,7 @@ import { Camera } from "./camera"
 import { Clock } from "./clock"
 import { FallingBlock } from "./falling-block"
 import { canvas, context } from "./graphics"
-import { Player } from "./player"
+import { HumanControllerTrait, Player } from "./player"
 import { vec } from "./vector"
 import { World } from "./world"
 import { WorldMap } from "./world-map"
@@ -17,7 +17,7 @@ export class Game {
 	camera = new Camera()
 
 	constructor() {
-		this.world.add(new Player(this.map))
+		this.world.add(new Player(this.map, new HumanControllerTrait()))
 	}
 
 	update(dt: number) {
