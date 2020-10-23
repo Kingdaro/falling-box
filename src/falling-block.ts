@@ -2,7 +2,7 @@ import { DrawRectTrait, GravityTrait } from "./common-traits"
 import { worldGridScale } from "./constants"
 import { Entity } from "./entity"
 import { FlyingBlockDestructionTargetTrait } from "./flying-block"
-import { GrabTargetTrait, PlayerCollisionTargetTrait } from "./player"
+import { GrabTargetTrait, PlayerPhysicsTargetTrait } from "./player"
 import { Rect } from "./rect"
 import { StaticBlock } from "./static-block"
 import { Trait } from "./trait"
@@ -21,7 +21,7 @@ export class FallingBlock extends Entity {
 			new BecomeStaticTrait(),
 			new GrabTargetTrait(),
 			new FlyingBlockDestructionTargetTrait(),
-			new PlayerCollisionTargetTrait(),
+			new PlayerPhysicsTargetTrait(),
 		])
 
 		this.rect = new Rect(

@@ -29,7 +29,6 @@ const grabDistance = 50
 export class Player extends Entity {
 	constructor(map: WorldMap) {
 		super([
-			new PlayerTrait(),
 			new DrawRectTrait(),
 			new MovementTrait(),
 			new JumpingTrait(),
@@ -48,6 +47,8 @@ export class Player extends Entity {
 	}
 }
 
+export class PlayerPhysicsTargetTrait extends Trait {}
+
 class PlayerSpawner extends Entity {
 	constructor(map: WorldMap) {
 		super([
@@ -59,10 +60,6 @@ class PlayerSpawner extends Entity {
 	}
 }
 
-export class PlayerTrait extends Trait {}
-
-export class PlayerCollisionTargetTrait extends Trait {}
-
 class PlayerPhysicsTrait extends Trait {
 	collisions: Collision[] = []
 
@@ -72,7 +69,7 @@ class PlayerPhysicsTrait extends Trait {
 
 	update() {
 		const result = this.world.findCollisions(this.entity, (ent) => {
-			return ent.has(PlayerCollisionTargetTrait)
+			return ent.has(PlayerPhysicsTargetTrait)
 		})
 
 		this.collisions = result.collisions

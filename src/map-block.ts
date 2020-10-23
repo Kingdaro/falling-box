@@ -2,7 +2,7 @@ import { DrawRectTrait } from "./common-traits"
 import { worldGridScale } from "./constants"
 import { Entity } from "./entity"
 import { FallingBlockFloorTrait } from "./falling-block"
-import { PlayerCollisionTargetTrait } from "./player"
+import { PlayerPhysicsTargetTrait } from "./player"
 import { Rect } from "./rect"
 import { vec } from "./vector"
 
@@ -11,7 +11,7 @@ export class MapBlock extends Entity {
 		super([
 			new DrawRectTrait(),
 			new FallingBlockFloorTrait(),
-			new PlayerCollisionTargetTrait(),
+			new PlayerPhysicsTargetTrait(),
 		])
 		this.rect = new Rect(
 			vec(width * worldGridScale, height * worldGridScale),

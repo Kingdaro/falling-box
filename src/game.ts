@@ -2,7 +2,7 @@ import { Camera } from "./camera"
 import { Clock } from "./clock"
 import { FallingBlock } from "./falling-block"
 import { canvas, context } from "./graphics"
-import { Player, PlayerTrait } from "./player"
+import { Player } from "./player"
 import { vec } from "./vector"
 import { World } from "./world"
 import { WorldMap } from "./world-map"
@@ -23,7 +23,7 @@ export class Game {
 	update(dt: number) {
 		this.world.update(dt)
 
-		const player = this.world.entities.find((e) => e.getOptional(PlayerTrait))
+		const player = this.world.entities.find((e) => e instanceof Player)
 		if (player) {
 			this.camera.moveTowards(
 				player.rect.center.plus(cameraOffset),

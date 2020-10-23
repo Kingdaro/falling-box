@@ -3,7 +3,7 @@ import { worldGridScale } from "./constants"
 import { Entity } from "./entity"
 import { FallingBlockFloorTrait } from "./falling-block"
 import { FlyingBlockDestructionTargetTrait } from "./flying-block"
-import { GrabTargetTrait, PlayerCollisionTargetTrait } from "./player"
+import { GrabTargetTrait, PlayerPhysicsTargetTrait } from "./player"
 import { Rect } from "./rect"
 import { vec, Vector } from "./vector"
 
@@ -14,7 +14,7 @@ export class StaticBlock extends Entity {
 			new TimerTrait(15, (ent) => ent.destroy()),
 			new FlyingBlockDestructionTargetTrait(),
 			new FallingBlockFloorTrait(),
-			new PlayerCollisionTargetTrait(),
+			new PlayerPhysicsTargetTrait(),
 			new GrabTargetTrait(),
 		])
 
