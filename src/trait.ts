@@ -20,3 +20,5 @@ export abstract class Trait {
 	draw?(): void
 	onMessage?(message: unknown): void
 }
+
+export class EmptyTrait extends Trait {}
