@@ -28,7 +28,7 @@ const grabDistance = 50
 export class Player extends Entity {
 	constructor(map: WorldMap, controller: Trait) {
 		const traits = [
-			new DrawRectTrait(),
+			new DrawRectTrait("cornflowerblue"),
 			new MovementTrait(),
 			new JumpingTrait(),
 			new GravityTrait(gravity),
@@ -52,10 +52,11 @@ export class Player extends Entity {
 
 export class PlayerPhysicsTargetTrait extends Trait {}
 
-class DeathTrait extends Trait {
+export class DeathTrait extends Trait {
 	kill() {
 		let player = this.entity
 		this.entity.destroy()
+		this.entity.get(GrabTrait).release()
 
 		const spawner = new Entity([
 			new TimerTrait(2, () => {
@@ -167,7 +168,7 @@ class GrabTrait extends Trait {
 		const grabPosition = this.getGrabPosition()
 		if (this.grabbing) {
 			this.grabbing = false
-			this.world.add(new FlyingBlock(grabPosition, this.direction))
+			this.world.add(new FlyingBlock(grabPosition, this.direction, this.entity))
 		}
 	}
 

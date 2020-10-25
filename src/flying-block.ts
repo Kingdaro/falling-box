@@ -1,16 +1,17 @@
 import { DrawRectTrait, TimerTrait } from "./common-traits"
 import { worldGridScale } from "./constants"
 import { Entity } from "./entity"
+import { DeathTrait } from "./player"
 import { Rect } from "./rect"
 import { Trait } from "./trait"
 import { vec, Vector } from "./vector"
 
 export class FlyingBlock extends Entity {
-	constructor(centerPosition: Vector, direction: 1 | -1) {
+	constructor(centerPosition: Vector, direction: 1 | -1, owner: Entity) {
 		super([
 			new DrawRectTrait("green"),
 			new TimerTrait(2, (ent) => ent.destroy()),
-			new DestructionTrait(direction),
+			new DestructionTrait(direction, owner),
 		])
 		this.rect = new Rect(
 			vec(worldGridScale),
@@ -26,7 +27,10 @@ class DestructionTrait extends Trait {
 	hits = 3
 	freezeTime = 0
 
-	constructor(private readonly direction: number) {
+	constructor(
+		private readonly direction: number,
+		private readonly owner: Entity,
+	) {
 		super()
 	}
 
@@ -37,16 +41,30 @@ class DestructionTrait extends Trait {
 		} else {
 			this.entity.velocity = vec(DestructionTrait.speed * this.direction, 0)
 
-			const hitBlock = this.world.entities.find(
-				(other) =>
-					other.has(FlyingBlockDestructionTargetTrait) &&
-					this.entity.rect.intersects(other.rect),
-			)
+			let hitBlock = false
+			let hitPlayer = false
 
-			if (hitBlock) {
-				this.hits -= 1
-				this.hits > 0 ? hitBlock.destroy() : this.entity.destroy()
-				this.freezeTime = DestructionTrait.maxFreezeTime
+			for (const ent of this.world.entities) {
+				if (
+					ent.has(FlyingBlockDestructionTargetTrait) &&
+					this.entity.rect.intersects(ent.rect)
+				) {
+					this.hits -= 1
+					this.hits > 0 ? ent.destroy() : this.entity.destroy()
+					this.freezeTime = DestructionTrait.maxFreezeTime
+					hitBlock = true
+				}
+
+				if (
+					ent.has(DeathTrait) &&
+					this.entity.rect.intersects(ent.rect) &&
+					ent !== this.owner
+				) {
+					ent.get(DeathTrait).kill()
+					hitPlayer = false
+				}
+
+				if (hitBlock && hitPlayer) break
 			}
 		}
 	}
