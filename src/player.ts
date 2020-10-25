@@ -33,10 +33,11 @@ export class Player extends Entity {
 			new JumpingTrait(),
 			new GravityTrait(gravity),
 			new PlayerPhysicsTrait(),
-			new VelocityResolutionTrait(),
-			new RespawnOnFalloutTrait(map),
+			new RespawnTrait(map),
+			new FalloutTrait(),
 			new GrabTrait(),
-			new SquishTrait(map),
+			new SquishTrait(),
+			new DeathTrait(),
 			controller,
 		]
 
@@ -51,14 +52,20 @@ export class Player extends Entity {
 
 export class PlayerPhysicsTargetTrait extends Trait {}
 
-class PlayerSpawner extends Entity {
-	constructor(map: WorldMap, controller: Trait) {
-		super([
-			new TimerTrait(2, (ent) => {
-				ent.world.add(new Player(map, controller))
-				ent.destroy()
+class DeathTrait extends Trait {
+	kill() {
+		let player = this.entity
+		this.entity.destroy()
+
+		const spawner = new Entity([
+			new TimerTrait(2, () => {
+				player.get(RespawnTrait).respawn()
+				this.world.add(player)
+				spawner.destroy()
 			}),
 		])
+
+		this.world.add(spawner)
 	}
 }
 
@@ -70,18 +77,15 @@ class PlayerPhysicsTrait extends Trait {
 	}
 
 	update() {
-		const result = this.world.findCollisions(this.entity, (ent) => {
-			return ent.has(PlayerPhysicsTargetTrait)
-		})
+		const { collisions, finalRect } = this.world.findCollisions(
+			this.entity,
+			(ent) => ent.has(PlayerPhysicsTargetTrait),
+		)
 
-		this.collisions = result.collisions
-		this.entity.rect = result.finalRect
-	}
-}
+		this.collisions = collisions
+		this.entity.rect = finalRect
 
-class VelocityResolutionTrait extends Trait {
-	update() {
-		const { collisions } = this.entity.get(PlayerPhysicsTrait)
+		// resolve velocity
 		let [xvel, yvel] = this.entity.velocity.components()
 
 		for (const { displacement, entity } of collisions) {
@@ -201,27 +205,29 @@ class GrabTrait extends Trait {
 
 export class GrabTargetTrait extends Trait {}
 
-class RespawnOnFalloutTrait extends Trait {
+class RespawnTrait extends Trait {
 	constructor(private readonly map: WorldMap) {
 		super()
 	}
 
+	respawn() {
+		this.entity.rect.position = vec(
+			this.map.getRespawnPosition(),
+			-respawnHeight,
+		)
+		this.entity.velocity = vec()
+	}
+}
+
+class FalloutTrait extends Trait {
 	update() {
 		if (this.entity.rect.top > falloutDepth) {
-			this.entity.rect.position = vec(
-				this.map.getRespawnPosition(),
-				-respawnHeight,
-			)
-			this.entity.velocity = vec()
+			this.entity.get(DeathTrait).kill()
 		}
 	}
 }
 
 class SquishTrait extends Trait {
-	constructor(private readonly map: WorldMap) {
-		super()
-	}
-
 	update() {
 		const { rect } = this.entity
 		const { isOnGround } = this.entity.get(PlayerPhysicsTrait)
@@ -239,10 +245,7 @@ class SquishTrait extends Trait {
 			const isBelow = rect.top > block.rect.center.y
 
 			if (isIntersecting && isInside && isBelow && isOnGround) {
-				this.entity.destroy()
-				this.world.add(
-					new PlayerSpawner(this.map, this.entity.get(HumanControllerTrait)),
-				)
+				this.entity.get(DeathTrait).kill()
 			}
 		}
 	}
