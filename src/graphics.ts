@@ -18,5 +18,5 @@ function sizeCanvasToWindow() {
 export function initGraphics() {
 	sizeCanvasToWindow()
 	window.addEventListener("resize", sizeCanvasToWindow)
-	document.body.append(canvas)
+	document.querySelector("#js-game-view")!.append(canvas)
 }
