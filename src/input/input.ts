@@ -10,7 +10,7 @@ export abstract class Input {
 
 	abstract getCurrentValue(): number
 
-	nextState(): InputState {
+	getNextState(): InputState {
 		const value = this.getCurrentValue()
 		const isDown = value > 0.5
 
@@ -47,5 +47,18 @@ export class CombinedInput extends Input {
 			if (value !== 0) return value
 		}
 		return 0
+	}
+}
+
+export class Controller<InputMap extends { [inputName: string]: Input }> {
+	constructor(readonly inputs: InputMap) {}
+
+	update() {
+		const states = {} as { [K in keyof InputMap]: InputState }
+		for (const name in this.inputs) {
+			const input = this.inputs[name]
+			if (input) states[name] = input.getNextState()
+		}
+		return states
 	}
 }

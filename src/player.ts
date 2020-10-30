@@ -5,7 +5,7 @@ import { FallingBlock } from "./falling-block"
 import { FlyingBlock } from "./flying-block"
 import { context } from "./graphics"
 import { GamepadAxisInput, GamepadButtonInput } from "./input/gamepad"
-import { Input } from "./input/input"
+import { Controller, Input } from "./input/input"
 import { KeyboardInput } from "./input/keyboard"
 import { Rect } from "./rect"
 import { Trait } from "./trait"
@@ -250,45 +250,43 @@ class SquishTrait extends Trait {
 }
 
 export class HumanControllerTrait extends Trait {
-	private readonly left = Input.combined(
-		GamepadAxisInput.negative("leftX"),
-		new GamepadButtonInput("dpadLeft"),
-		new KeyboardInput("ArrowLeft"),
-	)
+	private readonly controller = new Controller({
+		left: Input.combined(
+			GamepadAxisInput.negative("leftX"),
+			new GamepadButtonInput("dpadLeft"),
+			new KeyboardInput("ArrowLeft"),
+		),
 
-	private readonly right = Input.combined(
-		GamepadAxisInput.positive("leftX"),
-		new GamepadButtonInput("dpadRight"),
-		new KeyboardInput("ArrowRight"),
-	)
+		right: Input.combined(
+			GamepadAxisInput.positive("leftX"),
+			new GamepadButtonInput("dpadRight"),
+			new KeyboardInput("ArrowRight"),
+		),
 
-	private readonly jump = Input.combined(
-		new GamepadButtonInput("a"),
-		new KeyboardInput("ArrowUp"),
-	)
+		jump: Input.combined(
+			new GamepadButtonInput("a"),
+			new KeyboardInput("ArrowUp"),
+		),
 
-	private readonly grab = Input.combined(
-		new GamepadButtonInput("x"),
-		new KeyboardInput("KeyZ"),
-	)
+		grab: Input.combined(
+			new GamepadButtonInput("x"),
+			new KeyboardInput("KeyZ"),
+		),
+	})
 
 	update() {
-		// IDEA: add `Controller` class to let us update all of these in one go?
-		const leftInput = this.left.nextState()
-		const rightInput = this.right.nextState()
-		const jumpInput = this.jump.nextState()
-		const grabInput = this.grab.nextState()
+		const { left, right, jump, grab } = this.controller.update()
 
 		const movement = this.entity.get(MovementTrait)
-		movement.movement = rightInput.value - leftInput.value
+		movement.movement = right.value - left.value
 
 		const jumping = this.entity.get(JumpingTrait)
-		if (jumpInput.wasPressed) {
+		if (jump.wasPressed) {
 			jumping.jump()
 		}
 
 		const grabbing = this.entity.get(GrabTrait)
-		if (grabInput.wasPressed) grabbing.grab()
-		if (grabInput.wasReleased) grabbing.release()
+		if (grab.wasPressed) grabbing.grab()
+		if (grab.wasReleased) grabbing.release()
 	}
 }
