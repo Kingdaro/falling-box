@@ -21,6 +21,7 @@ const maxJumps = 2
 const falloutDepth = 1000
 const respawnHeight = 500
 const grabDistance = 50
+const respawnTimeSeconds = 2
 
 export class Player extends Entity {
 	constructor(map: WorldMap, controller: Trait) {
@@ -56,7 +57,7 @@ export class DeathTrait extends Trait {
 		this.entity.get(GrabTrait).release()
 
 		const spawner = new Entity([
-			new TimerTrait(2, () => {
+			new TimerTrait(respawnTimeSeconds, () => {
 				player.get(RespawnTrait).respawn()
 				this.world.add(player)
 				spawner.destroy()
