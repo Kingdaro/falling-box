@@ -4,12 +4,9 @@ import { Entity } from "./entity"
 import { FallingBlock } from "./falling-block"
 import { FlyingBlock } from "./flying-block"
 import { context } from "./graphics"
-import {
-	GamepadAxisInput,
-	GamepadButtonInput,
-	Input,
-	KeyboardInput,
-} from "./input"
+import { GamepadAxisInput, GamepadButtonInput } from "./input/gamepad"
+import { Input } from "./input/input"
+import { KeyboardInput } from "./input/keyboard"
 import { Rect } from "./rect"
 import { Trait } from "./trait"
 import { vec } from "./vector"
