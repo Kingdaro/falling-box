@@ -2,7 +2,7 @@ import { DrawRectTrait } from "./common-traits"
 import { worldGridScale } from "./constants"
 import { Entity } from "./entity"
 import { FallingBlockFloorTrait } from "./falling-block"
-import { PlayerPhysicsTargetTrait } from "./player"
+import { PlayerPhysicsTargetTrait } from "./player/player"
 import { Rect } from "./rect"
 import { vec } from "./vector"
 

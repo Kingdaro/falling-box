@@ -3,7 +3,7 @@ import { worldGridScale } from "./constants"
 import { Entity } from "./entity"
 import { FallingBlockFloorTrait } from "./falling-block"
 import { FlyingBlockDestructionTargetTrait } from "./flying-block"
-import { GrabTargetTrait, PlayerPhysicsTargetTrait } from "./player"
+import { GrabTargetTrait, PlayerPhysicsTargetTrait } from "./player/player"
 import { Rect } from "./rect"
 import { vec, Vector } from "./vector"
 

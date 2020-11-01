@@ -1,7 +1,7 @@
 import { DrawRectTrait, TimerTrait } from "./common-traits"
 import { worldGridScale } from "./constants"
 import { Entity } from "./entity"
-import { DeathTrait } from "./player"
+import { DeathTrait } from "./player/player"
 import { Rect } from "./rect"
 import { Trait } from "./trait"
 import { vec, Vector } from "./vector"

@@ -1,17 +1,14 @@
-import { DrawRectTrait, GravityTrait, TimerTrait } from "./common-traits"
-import { worldGridScale } from "./constants"
-import { Entity } from "./entity"
-import { FallingBlock } from "./falling-block"
-import { FlyingBlock } from "./flying-block"
-import { context } from "./graphics"
-import { GamepadAxisInput, GamepadButtonInput } from "./input/gamepad"
-import { Controller, Input } from "./input/input"
-import { KeyboardInput } from "./input/keyboard"
-import { Rect } from "./rect"
-import { Trait } from "./trait"
-import { vec } from "./vector"
-import { Collision } from "./world"
-import { WorldMap } from "./world-map"
+import { DrawRectTrait, GravityTrait, TimerTrait } from "../common-traits"
+import { worldGridScale } from "../constants"
+import { Entity } from "../entity"
+import { FallingBlock } from "../falling-block"
+import { FlyingBlock } from "../flying-block"
+import { context } from "../graphics"
+import { Rect } from "../rect"
+import { Trait } from "../trait"
+import { vec } from "../vector"
+import { Collision } from "../world"
+import { WorldMap } from "../world-map"
 
 const size = 40
 const gravity = 2600
@@ -106,10 +103,10 @@ class PlayerPhysicsTrait extends Trait {
 	}
 }
 
-class MovementTrait extends Trait {
+export class MovementTrait extends Trait {
 	movement = 0
 	jumps = maxJumps
-	
+
 	update() {
 		this.entity.velocity = vec(this.movement * speed, this.entity.velocity.y)
 		const { isOnGround } = this.entity.get(PlayerPhysicsTrait)
@@ -117,7 +114,6 @@ class MovementTrait extends Trait {
 			this.jumps = maxJumps
 		}
 	}
-
 
 	jump() {
 		if (this.jumps > 0) {
@@ -127,13 +123,12 @@ class MovementTrait extends Trait {
 	}
 }
 
-
-class GrabTrait extends Trait {
+export class GrabTrait extends Trait {
 	// consider splitting this value out into a DirectionTrait or a FacingTrait
 	// if this becomes relevant for more than grabbing
-	private direction: 1 | -1 = 1
+	direction: 1 | -1 = 1
 
-	private grabbing = false
+	grabbing = false
 
 	update() {
 		if (this.entity.velocity.x > 0 && this.direction < 0) {
@@ -243,46 +238,5 @@ class SquishTrait extends Trait {
 				this.entity.get(DeathTrait).kill()
 			}
 		}
-	}
-}
-
-export class HumanControllerTrait extends Trait {
-	private readonly controller = new Controller({
-		left: Input.combined(
-			GamepadAxisInput.negative("leftX"),
-			new GamepadButtonInput("dpadLeft"),
-			new KeyboardInput("ArrowLeft"),
-		),
-
-		right: Input.combined(
-			GamepadAxisInput.positive("leftX"),
-			new GamepadButtonInput("dpadRight"),
-			new KeyboardInput("ArrowRight"),
-		),
-
-		jump: Input.combined(
-			new GamepadButtonInput("a"),
-			new KeyboardInput("ArrowUp"),
-		),
-
-		grab: Input.combined(
-			new GamepadButtonInput("x"),
-			new KeyboardInput("KeyZ"),
-		),
-	})
-
-	update() {
-		const { left, right, jump, grab } = this.controller.update()
-
-		const movement = this.entity.get(MovementTrait)
-		movement.movement = right.value - left.value
-
-		if (jump.wasPressed) {
-			movement.jump()
-		}
-
-		const grabbing = this.entity.get(GrabTrait)
-		if (grab.wasPressed) grabbing.grab()
-		if (grab.wasReleased) grabbing.release()
 	}
 }
