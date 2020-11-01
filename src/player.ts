@@ -28,7 +28,6 @@ export class Player extends Entity {
 		const traits = [
 			new DrawRectTrait("cornflowerblue"),
 			new MovementTrait(),
-			new JumpingTrait(),
 			new GravityTrait(gravity),
 			new PlayerPhysicsTrait(),
 			new RespawnTrait(map),
@@ -109,20 +108,16 @@ class PlayerPhysicsTrait extends Trait {
 
 class MovementTrait extends Trait {
 	movement = 0
+	jumps = maxJumps
+	
 	update() {
 		this.entity.velocity = vec(this.movement * speed, this.entity.velocity.y)
-	}
-}
-
-class JumpingTrait extends Trait {
-	jumps = maxJumps
-
-	update() {
 		const { isOnGround } = this.entity.get(PlayerPhysicsTrait)
 		if (isOnGround) {
 			this.jumps = maxJumps
 		}
 	}
+
 
 	jump() {
 		if (this.jumps > 0) {
@@ -131,6 +126,7 @@ class JumpingTrait extends Trait {
 		}
 	}
 }
+
 
 class GrabTrait extends Trait {
 	// consider splitting this value out into a DirectionTrait or a FacingTrait
@@ -281,9 +277,8 @@ export class HumanControllerTrait extends Trait {
 		const movement = this.entity.get(MovementTrait)
 		movement.movement = right.value - left.value
 
-		const jumping = this.entity.get(JumpingTrait)
 		if (jump.wasPressed) {
-			jumping.jump()
+			movement.jump()
 		}
 
 		const grabbing = this.entity.get(GrabTrait)
