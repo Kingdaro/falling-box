@@ -1,8 +1,8 @@
-import { Clock } from "../clock"
 import { worldGridScale } from "../constants"
 import { Entity } from "../entity"
 import { context } from "../graphics"
 import { Grid } from "../grid"
+import { TaskId } from "../scheduler"
 import { Trait } from "../trait"
 import { Vector } from "../vector"
 import { GrabTargetTrait, GrabTrait, MovementTrait } from "./player"
@@ -17,14 +17,15 @@ const maxIdleTime = 1
 
 export class RobotControllerTrait extends Trait {
 	state = State.Idle
-	idleClock = Clock.single(maxIdleTime)
+	idleTask?: TaskId
 	debugSpaceCount = 0
 	debugClosestSpace?: Vector
 
-	update(dt: number) {
-		if (this.state === State.Idle && this.idleClock.advance(dt)) {
-			this.state = State.FindingBlock
-			this.idleClock.reset()
+	update() {
+		if (this.state === State.Idle) {
+			this.idleTask ??= this.world.scheduler.after(maxIdleTime, () => {
+				this.state = State.FindingBlock
+			})
 		}
 
 		if (this.state === State.FindingBlock) {

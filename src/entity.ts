@@ -61,4 +61,9 @@ export class Entity {
 	destroy() {
 		this.world.remove(this)
 	}
+
+	/**
+	 * Called when added to the world
+	 */
+	onAdded?(): void
 }

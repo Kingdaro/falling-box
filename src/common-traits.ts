@@ -1,4 +1,3 @@
-import { Entity } from "./entity"
 import { context } from "./graphics"
 import { Trait } from "./trait"
 import { vec } from "./vector"
@@ -27,21 +26,5 @@ export class GravityTrait extends Trait {
 				this.terminalVelocity,
 			),
 		)
-	}
-}
-
-export class TimerTrait extends Trait {
-	private completed = false
-
-	constructor(private time: number, private action: (entity: Entity) => void) {
-		super()
-	}
-
-	update(dt: number) {
-		this.time -= dt
-		if (this.time < 0 && !this.completed) {
-			this.action(this.entity)
-			this.completed = true
-		}
 	}
 }

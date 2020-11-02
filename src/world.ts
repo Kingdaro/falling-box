@@ -1,6 +1,7 @@
 import { Entity } from "./entity"
 import { compare } from "./helpers"
 import { Rect } from "./rect"
+import { Scheduler } from "./scheduler"
 import { vec, Vector } from "./vector"
 
 export type Collision = {
@@ -11,6 +12,7 @@ export type Collision = {
 export class World {
 	private entitySet = new Set<Entity>()
 	private removedEntities = new Set<Entity>()
+	scheduler = new Scheduler()
 
 	get entities() {
 		return [...this.entitySet] as const
@@ -19,6 +21,7 @@ export class World {
 	add<T extends Entity>(ent: T): T {
 		ent.world = this
 		this.entitySet.add(ent)
+		ent.onAdded?.()
 		return ent
 	}
 
@@ -27,6 +30,7 @@ export class World {
 	}
 
 	update(dt: number) {
+		this.scheduler.update(dt)
 		this.entitySet.forEach((e) => e.update(dt))
 		this.removedEntities.forEach((e) => this.entitySet.delete(e))
 		this.removedEntities.clear()

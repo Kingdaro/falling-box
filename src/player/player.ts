@@ -1,4 +1,4 @@
-import { DrawRectTrait, GravityTrait, TimerTrait } from "../common-traits"
+import { DrawRectTrait, GravityTrait } from "../common-traits"
 import { worldGridScale } from "../constants"
 import { Entity } from "../entity"
 import { FallingBlock } from "../falling-block"
@@ -47,20 +47,21 @@ export class Player extends Entity {
 export class PlayerPhysicsTargetTrait extends Trait {}
 
 export class DeathTrait extends Trait {
+	dead = false
+
 	kill() {
+		if (this.dead) return
+		this.dead = true
+
 		let player = this.entity
 		this.entity.destroy()
 		this.entity.get(GrabTrait).release()
 
-		const spawner = new Entity([
-			new TimerTrait(respawnTimeSeconds, () => {
-				player.get(RespawnTrait).respawn()
-				this.world.add(player)
-				spawner.destroy()
-			}),
-		])
-
-		this.world.add(spawner)
+		this.world.scheduler.after(respawnTimeSeconds, () => {
+			this.world.add(player)
+			player.get(RespawnTrait).respawn()
+			this.dead = false
+		})
 	}
 }
 

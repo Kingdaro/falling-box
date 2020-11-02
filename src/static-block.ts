@@ -1,4 +1,4 @@
-import { DrawRectTrait, TimerTrait } from "./common-traits"
+import { DrawRectTrait } from "./common-traits"
 import { worldGridScale } from "./constants"
 import { Entity } from "./entity"
 import { FallingBlockFloorTrait } from "./falling-block"
@@ -11,7 +11,6 @@ export class StaticBlock extends Entity {
 	constructor(position: Vector) {
 		super([
 			new DrawRectTrait(),
-			new TimerTrait(15, (ent) => ent.destroy()),
 			new FlyingBlockDestructionTargetTrait(),
 			new FallingBlockFloorTrait(),
 			new PlayerPhysicsTargetTrait(),
@@ -19,5 +18,9 @@ export class StaticBlock extends Entity {
 		])
 
 		this.rect = new Rect(vec(worldGridScale), position)
+	}
+
+	onAdded() {
+		this.world.scheduler.after(15, () => this.destroy())
 	}
 }

@@ -1,5 +1,4 @@
 import { Camera } from "./camera"
-import { Clock } from "./clock"
 import { FallingBlock } from "./falling-block"
 import { canvas, context } from "./graphics"
 import { HumanControllerTrait } from "./player/human-controller"
@@ -13,7 +12,6 @@ const cameraStiffness = 8
 const cameraOffset = vec(0, -150)
 
 export class Game {
-	blockSpawnClock = Clock.repeating(0.3)
 	world = new World()
 	map = new WorldMap(this.world)
 	camera = new Camera()
@@ -21,6 +19,10 @@ export class Game {
 	constructor() {
 		this.world.add(new Player(this.map, new HumanControllerTrait()))
 		this.world.add(new Player(this.map, new RobotControllerTrait()))
+
+		this.world.scheduler.repeat(0.3, () => {
+			this.world.add(new FallingBlock(this.map))
+		})
 	}
 
 	update(dt: number) {
@@ -32,10 +34,6 @@ export class Game {
 				player.rect.center.plus(cameraOffset),
 				dt * cameraStiffness,
 			)
-		}
-
-		while (this.blockSpawnClock.advance(dt)) {
-			this.world.add(new FallingBlock(this.map))
 		}
 	}
 

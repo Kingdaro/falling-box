@@ -1,4 +1,4 @@
-import { DrawRectTrait, TimerTrait } from "./common-traits"
+import { DrawRectTrait } from "./common-traits"
 import { worldGridScale } from "./constants"
 import { Entity } from "./entity"
 import { DeathTrait } from "./player/player"
@@ -8,15 +8,16 @@ import { vec, Vector } from "./vector"
 
 export class FlyingBlock extends Entity {
 	constructor(centerPosition: Vector, direction: 1 | -1, owner: Entity) {
-		super([
-			new DrawRectTrait("green"),
-			new TimerTrait(2, (ent) => ent.destroy()),
-			new DestructionTrait(direction, owner),
-		])
+		super([new DrawRectTrait("green"), new DestructionTrait(direction, owner)])
+
 		this.rect = new Rect(
 			vec(worldGridScale),
 			centerPosition.minus(worldGridScale / 2),
 		)
+	}
+
+	onAdded() {
+		this.world.scheduler.after(2, () => this.destroy())
 	}
 }
 
