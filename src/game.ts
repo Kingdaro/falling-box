@@ -43,9 +43,5 @@ export class Game {
 		this.camera.apply(() => {
 			this.world.draw()
 		})
-
-		this.world.entities.forEach((e) => {
-			e.getOptional(RobotControllerTrait)?.drawDebug()
-		})
 	}
 }

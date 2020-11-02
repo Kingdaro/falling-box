@@ -5,27 +5,35 @@ type Task = {
 	repeat?: boolean
 }
 
-export type TaskId = string
+type TaskId = string
+
+export type TaskHandle = {
+	cancel: () => void
+}
 
 export class Scheduler {
 	private tasks = new Map<TaskId, Task>()
 
-	private addTask(time: number, fn: () => void, repeat: boolean): TaskId {
+	private add(time: number, fn: () => void, repeat: boolean): TaskHandle {
 		const id = String(Math.random())
+
 		this.tasks.set(id, { currentTime: time, period: time, fn, repeat })
-		return id
+
+		return {
+			cancel: () => this.remove(id),
+		}
 	}
 
-	after(time: number, fn: () => void): TaskId {
-		return this.addTask(time, fn, false)
-	}
-
-	repeat(time: number, fn: () => void): TaskId {
-		return this.addTask(time, fn, true)
-	}
-
-	cancel(id: TaskId) {
+	private remove(id: TaskId) {
 		this.tasks.delete(id)
+	}
+
+	after(time: number, fn: () => void): TaskHandle {
+		return this.add(time, fn, false)
+	}
+
+	repeat(time: number, fn: () => void): TaskHandle {
+		return this.add(time, fn, true)
 	}
 
 	update(dt: number) {
