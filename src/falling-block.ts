@@ -15,14 +15,13 @@ const terminalVelocity = 800
 
 export class FallingBlock extends Entity {
 	constructor(map: WorldMap) {
-		super([
-			new DrawRectTrait(),
-			new GravityTrait(gravity, terminalVelocity),
-			new BecomeStaticTrait(),
-			new GrabTargetTrait(),
-			new FlyingBlockDestructionTargetTrait(),
-			new PlayerPhysicsTargetTrait(),
-		])
+		super()
+		this.attach(DrawRectTrait, {})
+			.attach(GravityTrait, { amount: gravity, terminalVelocity })
+			.attach(BecomeStaticTrait)
+			.attach(GrabTargetTrait)
+			.attach(FlyingBlockDestructionTargetTrait)
+			.attach(PlayerPhysicsTargetTrait)
 
 		this.rect = new Rect(
 			vec(worldGridScale),

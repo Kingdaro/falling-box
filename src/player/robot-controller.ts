@@ -1,63 +1,51 @@
 import { worldGridScale } from "../constants"
 import { Entity } from "../entity"
 import { Grid } from "../grid"
-import { TaskHandle } from "../scheduler"
-import { StateMachine, StateMachineState } from "../state-machine"
 import { Trait } from "../trait"
 import { Vector } from "../vector"
-import { World } from "../world"
 import { GrabTargetTrait, GrabTrait, MovementTrait } from "./player"
 
 const maxIdleTime = 1
 
+type RobotState = {
+	onEnter?: () => void | undefined | (() => void)
+	update?: (dt: number) => void
+}
+
 export class RobotControllerTrait extends Trait {
-	machine?: StateMachine
+	currentState?: RobotState
+	currentCleanup?: () => void
 
-	constructor() {
-		super()
+	idleState: RobotState = {
+		onEnter: () => {
+			const task = this.world.scheduler.after(maxIdleTime, () => {
+				this.setState(this.findingBlockState)
+			})
+			return task.cancel
+		},
+	}
 
-		setTimeout(() => {
-			this.machine = new StateMachine([
-				new IdleState(this.world),
-				new FindingBlockState(this.world, this.entity),
-			])
-			this.machine.setState(IdleState)
-		})
+	findingBlockState: RobotState = {
+		onEnter: () => {
+			const task = this.world.scheduler.repeat(0.3, () => {
+				this.tryGrabBlock()
+			})
+			return task.cancel
+		},
 	}
 
 	update(dt: number) {
-		this.machine?.update(dt)
-	}
-}
-
-class IdleState extends StateMachineState {
-	constructor(private readonly world: World) {
-		super()
+		if (!this.currentState) {
+			this.setState(this.idleState)
+		}
+		this.currentState?.update?.(dt)
 	}
 
-	onEnter() {
-		this.world.scheduler.after(maxIdleTime, () => {
-			this.machine.setState(FindingBlockState)
-		})
-	}
-}
+	setState(state: RobotState) {
+		this.currentCleanup?.()
 
-class FindingBlockState extends StateMachineState {
-	// grabSpace?: GrabSpace
-	private task?: TaskHandle
-
-	constructor(private readonly world: World, private readonly entity: Entity) {
-		super()
-	}
-
-	onEnter() {
-		this.task = this.world.scheduler.repeat(0.3, () => {
-			this.tryGrabBlock()
-		})
-	}
-
-	onExit() {
-		this.task?.cancel()
+		this.currentState = state
+		this.currentCleanup = state.onEnter?.() || undefined
 	}
 
 	tryGrabBlock() {
@@ -118,7 +106,7 @@ class FindingBlockState extends StateMachineState {
 				grab.grab()
 
 				if (grab.grabbing) {
-					this.machine.setState(IdleState)
+					this.setState(this.idleState)
 				}
 			}
 

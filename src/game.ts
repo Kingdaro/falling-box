@@ -17,8 +17,8 @@ export class Game {
 	camera = new Camera()
 
 	constructor() {
-		this.world.add(new Player(this.map, new HumanControllerTrait()))
-		this.world.add(new Player(this.map, new RobotControllerTrait()))
+		this.world.add(new Player(this.map).attach(HumanControllerTrait))
+		this.world.add(new Player(this.map).attach(RobotControllerTrait))
 
 		this.world.scheduler.repeat(0.3, () => {
 			this.world.add(new FallingBlock(this.map))

@@ -1,18 +1,9 @@
 import { Entity } from "./entity"
-import { raise } from "./helpers"
 
-export abstract class Trait {
-	private _entity?: Entity
+export abstract class Trait<T = void> {
+	constructor(protected readonly entity: Entity, protected readonly data: T) {}
 
-	set entity(ent: Entity) {
-		this._entity = ent
-	}
-
-	get entity() {
-		return this._entity ?? raise("Trait must be added to an entity")
-	}
-
-	get world() {
+	protected get world() {
 		return this.entity.world
 	}
 

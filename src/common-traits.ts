@@ -2,28 +2,23 @@ import { context } from "./graphics"
 import { Trait } from "./trait"
 import { vec } from "./vector"
 
-export class DrawRectTrait extends Trait {
-	constructor(public color = "white") {
-		super()
-	}
-
+export class DrawRectTrait extends Trait<{ color?: string }> {
 	draw() {
-		context.fillStyle = this.color
+		context.fillStyle = this.data.color ?? "white"
 		context.fillRect(...this.entity.rect.valuesRounded)
 	}
 }
 
-export class GravityTrait extends Trait {
-	constructor(public amount: number, public terminalVelocity = Infinity) {
-		super()
-	}
-
+export class GravityTrait extends Trait<{
+	amount: number
+	terminalVelocity?: number
+}> {
 	update(dt: number) {
 		this.entity.velocity = vec(
 			this.entity.velocity.x,
 			Math.min(
-				this.entity.velocity.y + this.amount * dt,
-				this.terminalVelocity,
+				this.entity.velocity.y + this.data.amount * dt,
+				this.data.terminalVelocity ?? Infinity,
 			),
 		)
 	}

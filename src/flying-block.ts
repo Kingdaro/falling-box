@@ -8,7 +8,12 @@ import { vec, Vector } from "./vector"
 
 export class FlyingBlock extends Entity {
 	constructor(centerPosition: Vector, direction: 1 | -1, owner: Entity) {
-		super([new DrawRectTrait("green"), new DestructionTrait(direction, owner)])
+		super()
+
+		this.attach(DrawRectTrait, { color: "green" }).attach(DestructionTrait, {
+			direction,
+			owner,
+		})
 
 		this.rect = new Rect(
 			vec(worldGridScale),
@@ -21,26 +26,22 @@ export class FlyingBlock extends Entity {
 	}
 }
 
-class DestructionTrait extends Trait {
+class DestructionTrait extends Trait<{ direction: number; owner: Entity }> {
 	static maxFreezeTime = 0.15
 	static speed = 1000
 
 	hits = 3
 	freezeTime = 0
 
-	constructor(
-		private readonly direction: number,
-		private readonly owner: Entity,
-	) {
-		super()
-	}
-
 	update(dt: number) {
 		if (this.freezeTime > 0) {
 			this.entity.velocity = vec(0, 0)
 			this.freezeTime -= dt
 		} else {
-			this.entity.velocity = vec(DestructionTrait.speed * this.direction, 0)
+			this.entity.velocity = vec(
+				DestructionTrait.speed * this.data.direction,
+				0,
+			)
 
 			let hitBlock = false
 			let hitPlayer = false
@@ -59,7 +60,7 @@ class DestructionTrait extends Trait {
 				if (
 					ent.has(DeathTrait) &&
 					this.entity.rect.intersects(ent.rect) &&
-					ent !== this.owner
+					ent !== this.data.owner
 				) {
 					ent.get(DeathTrait).kill()
 					hitPlayer = false
