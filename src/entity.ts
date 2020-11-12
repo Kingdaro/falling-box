@@ -4,13 +4,13 @@ import { Trait } from "./trait"
 import { vec } from "./vector"
 import { World } from "./world"
 
-type TraitClass<T> = new (entity: Entity, data: T) => Trait<T>
+type TraitClass<T extends Trait> = new (entity: Entity) => T
 
 export class Entity {
 	rect = new Rect()
 	velocity = vec()
 
-	private traits = new Map<Function, Trait<unknown>>()
+	private traits = new Map<Function, Trait>()
 
 	private _world?: World
 
@@ -22,44 +22,36 @@ export class Entity {
 		return this._world ?? raise("Entity must be added to a world")
 	}
 
-	// I would love to compress these overloads into one,
-	// but generic void arguments still don't work :(
-	attach(TraitClass: TraitClass<void>): this
-	attach<D>(TraitClass: TraitClass<D>, data: D): this
-	attach(TraitClass: TraitClass<any>, data?: any) {
-		this.traits.set(TraitClass, new TraitClass(this, data))
-		return this
+	add(trait: Trait) {
+		this.traits.set(trait.constructor, trait)
 	}
 
-	getOptional<T extends Trait<unknown>>(
-		constructor: new (...args: any[]) => T,
-	): T | undefined {
+	getOptional<T extends Trait>(constructor: TraitClass<T>): T | undefined {
 		const trait = this.traits.get(constructor)
 		if (trait instanceof constructor) return trait
 	}
 
-	get<T extends Trait<unknown>>(constructor: new (...args: any[]) => T): T {
+	get<T extends Trait>(constructor: TraitClass<T>): T {
 		return (
 			this.getOptional(constructor) ??
 			raise(`trait "${constructor.name}" not found`)
 		)
 	}
 
-	has(constructor: new (...args: any[]) => Trait<unknown>) {
+	has(constructor: TraitClass<Trait>) {
 		return this.traits.has(constructor)
 	}
 
 	update(dt: number) {
 		this.rect.position = this.rect.position.plus(this.velocity.times(dt))
-		this.traits.forEach((t) => t.update?.(dt))
+
+		this.traits.forEach((t) => {
+			return t.update?.({ entity: this, world: this.world, dt })
+		})
 	}
 
 	draw() {
-		this.traits.forEach((t) => t.draw?.())
-	}
-
-	onMessage(message: unknown) {
-		this.traits.forEach((t) => t.onMessage?.(message))
+		this.traits.forEach((t) => t.draw?.({ entity: this, world: this.world }))
 	}
 
 	destroy() {

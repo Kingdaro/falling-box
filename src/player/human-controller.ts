@@ -1,7 +1,7 @@
 import { GamepadAxisInput, GamepadButtonInput } from "../input/gamepad"
 import { Controller, Input } from "../input/input"
 import { KeyboardInput } from "../input/keyboard"
-import { Trait } from "../trait"
+import { Trait, TraitUpdateArgs } from "../trait"
 import { GrabTrait, MovementTrait } from "./player"
 
 export class HumanControllerTrait extends Trait {
@@ -29,17 +29,17 @@ export class HumanControllerTrait extends Trait {
 		),
 	})
 
-	update() {
+	update({ entity }: TraitUpdateArgs) {
 		const { left, right, jump, grab } = this.controller.update()
 
-		const movement = this.entity.get(MovementTrait)
+		const movement = entity.get(MovementTrait)
 		movement.movement = right.value - left.value
 
 		if (jump.wasPressed) {
 			movement.jump()
 		}
 
-		const grabbing = this.entity.get(GrabTrait)
+		const grabbing = entity.get(GrabTrait)
 		if (grab.wasPressed) grabbing.grab()
 		if (grab.wasReleased) grabbing.release()
 	}

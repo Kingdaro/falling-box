@@ -1,15 +1,15 @@
 import { worldGridScale } from "../constants"
 import { Entity } from "../entity"
 import { Grid } from "../grid"
-import { Trait } from "../trait"
+import { Trait, TraitArgs, TraitUpdateArgs } from "../trait"
 import { Vector } from "../vector"
 import { GrabTargetTrait, GrabTrait, MovementTrait } from "./player"
 
 const maxIdleTime = 1
 
 type RobotState = {
-	onEnter?: () => void | undefined | (() => void)
-	update?: (dt: number) => void
+	onEnter?: (args: TraitArgs) => void | undefined | (() => void)
+	update?: (args: TraitUpdateArgs) => void
 }
 
 export class RobotControllerTrait extends Trait {
@@ -17,35 +17,35 @@ export class RobotControllerTrait extends Trait {
 	currentCleanup?: () => void
 
 	idleState: RobotState = {
-		onEnter: () => {
-			const task = this.world.scheduler.after(maxIdleTime, () => {
-				this.setState(this.findingBlockState)
+		onEnter: (args) => {
+			const task = args.world.scheduler.after(maxIdleTime, () => {
+				this.setState(this.findingBlockState, args)
 			})
 			return task.cancel
 		},
 	}
 
 	findingBlockState: RobotState = {
-		onEnter: () => {
-			const task = this.world.scheduler.repeat(0.3, () => {
+		onEnter: ({ world }) => {
+			const task = world.scheduler.repeat(0.3, () => {
 				this.tryGrabBlock()
 			})
 			return task.cancel
 		},
 	}
 
-	update(dt: number) {
+	update(args: TraitUpdateArgs) {
 		if (!this.currentState) {
-			this.setState(this.idleState)
+			this.setState(this.idleState, args)
 		}
-		this.currentState?.update?.(dt)
+		this.currentState?.update?.(args)
 	}
 
-	setState(state: RobotState) {
+	setState(state: RobotState, args: TraitArgs) {
 		this.currentCleanup?.()
 
 		this.currentState = state
-		this.currentCleanup = state.onEnter?.() || undefined
+		this.currentCleanup = state.onEnter?.(args) || undefined
 	}
 
 	tryGrabBlock() {

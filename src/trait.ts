@@ -1,15 +1,12 @@
 import { Entity } from "./entity"
+import { World } from "./world"
 
-export abstract class Trait<T = void> {
-	constructor(protected readonly entity: Entity, protected readonly data: T) {}
+export type TraitArgs = { entity: Entity; world: World }
+export type TraitUpdateArgs = TraitArgs & { dt: number }
 
-	protected get world() {
-		return this.entity.world
-	}
-
-	update?(dt: number): void
-	draw?(): void
-	onMessage?(message: unknown): void
+export abstract class Trait {
+	update?(context: TraitUpdateArgs): void
+	draw?(context: TraitArgs): void
 }
 
 export class EmptyTrait extends Trait {}
