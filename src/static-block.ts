@@ -9,13 +9,13 @@ import { vec, Vector } from "./vector"
 
 export class StaticBlock extends Entity {
 	constructor(position: Vector) {
-		super()
-
-		this.attach(DrawRectTrait, {})
-			.attach(FlyingBlockDestructionTargetTrait)
-			.attach(FallingBlockFloorTrait)
-			.attach(PlayerPhysicsTargetTrait)
-			.attach(GrabTargetTrait)
+		super([
+			new DrawRectTrait(),
+			new FlyingBlockDestructionTargetTrait(),
+			new FallingBlockFloorTrait(),
+			new PlayerPhysicsTargetTrait(),
+			new GrabTargetTrait(),
+		])
 
 		this.rect = new Rect(vec(worldGridScale), position)
 	}

@@ -21,18 +21,21 @@ const grabDistance = 50
 const respawnTimeSeconds = 2
 
 export class Player extends Entity {
-	constructor(map: WorldMap) {
-		super()
+	constructor(map: WorldMap, controller: Trait) {
+		const traits = [
+			new DrawRectTrait("cornflowerblue"),
+			new MovementTrait(),
+			new GravityTrait(gravity),
+			new PlayerPhysicsTrait(),
+			new RespawnTrait(map),
+			new FalloutTrait(),
+			new GrabTrait(),
+			new SquishTrait(),
+			new DeathTrait(),
+			controller,
+		]
 
-		this.attach(DrawRectTrait, { color: "cornflowerblue" })
-			.attach(MovementTrait)
-			.attach(GravityTrait, { amount: gravity })
-			.attach(PlayerPhysicsTrait)
-			.attach(RespawnTrait, { map })
-			.attach(FalloutTrait)
-			.attach(GrabTrait)
-			.attach(SquishTrait)
-			.attach(DeathTrait)
+		super(traits)
 
 		this.rect = new Rect(
 			vec(size),
@@ -193,10 +196,14 @@ export class GrabTrait extends Trait {
 
 export class GrabTargetTrait extends Trait {}
 
-class RespawnTrait extends Trait<{ map: WorldMap }> {
+class RespawnTrait extends Trait {
+	constructor(private readonly map: WorldMap) {
+		super()
+	}
+
 	respawn() {
 		this.entity.rect.position = vec(
-			this.data.map.getRespawnPosition(),
+			this.map.getRespawnPosition(),
 			-respawnHeight,
 		)
 		this.entity.velocity = vec()
